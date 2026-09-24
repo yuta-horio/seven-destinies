@@ -190,45 +190,45 @@
   <!-- MODE SELECT -->
   <div id="modeScreen" class="screen">
     <div><div class="title-en">THE SEVEN<span class="title-star"> ✦ </span>DESTINIES</div>
-      <div class="title-jp">7つの心が、世界をつなぐ</div></div>
-    <div style="font-family:var(--pop);font-size:14px;color:#ffd36b">どっちで あそぶ？</div>
+      <div class="title-jp">7つの<ruby>心<rt>こころ</rt></ruby>が、<ruby>世界<rt>せかい</rt></ruby>をつなぐ</div></div>
+    <div style="font-family:var(--pop);font-size:14px;color:#ffd36b">どっちで <ruby>遊<rt>あそ</rt></ruby>ぶ？</div>
     <div class="modeCard action" id="modeAction"><div class="mi">⚔️</div>
-      <div class="mt"><b>アクションバトル</b><small>3人で 10連戦！たおすと <b style="color:#ffd36b">賞品＋コイン</b> ゲット。むずかしいよ。（レベルは あがらない）</small></div></div>
+      <div class="mt"><b>アクションバトル</b><small>3<ruby>人<rt>にん</rt></ruby>で 10れんせん！たおすと <b style="color:#ffd36b">しょうひん＋コイン</b> ゲット。むずかしいよ。（レベルは <ruby>上<rt>あ</rt></ruby>がらない）</small></div></div>
     <div class="modeCard rpg" id="modeRpg"><div class="mi">📖</div>
-      <div class="mt"><b>ぼうけん（100体クエスト）</b><small>1戦ずつ てきを たおして レベルアップ。ぜんぶで100体。10人から 出撃を えらび、つづきから あそべる。</small></div></div>
+      <div class="mt"><b>ぼうけん（100<ruby>体<rt>たい</rt></ruby>クエスト）</b><small>1せんずつ てきを たおして レベルアップ。ぜんぶで100<ruby>体<rt>たい</rt></ruby>。10<ruby>人<rt>にん</rt></ruby>から しゅつげきを えらび、つづきから <ruby>遊<rt>あそ</rt></ruby>べる。</small></div></div>
     <div class="modeCard quiz" id="modeQuiz"><div class="mi">📝</div>
       <div class="mt"><b>クイズ<ruby>王<rt>おう</rt></ruby>チャレンジ</b><small><ruby>国語<rt>こくご</rt></ruby>・<ruby>算数<rt>さんすう</rt></ruby>・<ruby>理科<rt>りか</rt></ruby>・<ruby>社会<rt>しゃかい</rt></ruby>・<ruby>野球<rt>やきゅう</rt></ruby>・<ruby>一般<rt>いっぱん</rt></ruby><ruby>常識<rt>じょうしき</rt></ruby>から <ruby>全<rt>ぜん</rt></ruby>10<ruby>問<rt>もん</rt></ruby>。<ruby>正解<rt>せいかい</rt></ruby>すると <b style="color:#ffd36b">コイン＋アイテム</b>！ たくさん あてると おおもうけ。</small></div></div>
-    <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを かう／賞品を うる</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
+    <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを <ruby>買<rt>か</rt></ruby>う／しょうひんを <ruby>売<rt>う</rt></ruby>る</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
     <div id="charLv" style="width:100%;max-width:430px"></div>
-    <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの あいしょうひょう を みる</button>
+    <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの あいしょうひょうを <ruby>見<rt>み</rt></ruby>る</button>
     <div id="savePanel" style="width:100%;max-width:340px;font-size:12px;color:#c9a6ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;text-align:left;line-height:1.7"></div>
     <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">きろくは じどうで ほぞんされます。とじても だいじょうぶ。</div>
     <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center;margin-top:2px">
       <button class="btn sub" id="resetLvBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">レベルを1に もどす</button>
-      <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">討伐きろくを けす</button>
+      <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85"><ruby>討伐<rt>とうばつ</rt></ruby>きろくを <ruby>消<rt>け</rt></ruby>す</button>
     </div>
-    <div style="width:100%;max-width:340px;font-size:9px;color:#7a7090;text-align:center">※パスワードが ひつよう（おうちのひとに きいてね）</div>
+    <div style="width:100%;max-width:340px;font-size:9px;color:#7a7090;text-align:center">※パスワードが ひつよう（おうちの<ruby>人<rt>ひと</rt></ruby>に <ruby>聞<rt>き</rt></ruby>いてね）</div>
   </div>
 
   <!-- ACTION: character select -->
   <div id="titleScreen" class="screen" hidden>
     <div class="title-en" style="font-size:28px">アクションバトル</div>
-    <div class="title-lead">まおう <b>BLACK</b> が せかいを のっとろうとしている！<br>
-      <span style="color:#c9a6ff;font-size:.85em">なかまを 3人 えらんで たたかおう。てきを たおすと レベルアップ！</span></div>
+    <div class="title-lead">まおう <b>BLACK</b> が <ruby>世界<rt>せかい</rt></ruby>を のっとろうとしている！<br>
+      <span style="color:#c9a6ff;font-size:.85em">なかまを 3<ruby>人<rt>にん</rt></ruby> えらんで たたかおう。てきを たおすと レベルアップ！</span></div>
     <div class="selInfo" id="selInfo"></div>
     <div class="roster" id="rosterBox"></div>
-    <div><div class="fieldlabel" style="margin-bottom:6px">プレイヤーめい</div>
+    <div><div class="fieldlabel" style="margin-bottom:6px">プレイヤー<ruby>名<rt>めい</rt></ruby></div>
       <input id="nameInput" type="text" maxlength="6" value="さくたろう" autocomplete="off" spellcheck="false"></div>
-    <button class="btn" id="startBtn">ぼうけんを はじめる</button>
-    <button class="btn sub" id="helpBtn">わざ・のうりょくを みる</button>
+    <button class="btn" id="startBtn">ぼうけんを <ruby>始<rt>はじ</rt></ruby>める</button>
+    <button class="btn sub" id="helpBtn">わざ・のうりょくを <ruby>見<rt>み</rt></ruby>る</button>
     <div style="font-size:11px;line-height:1.7;color:rgba(255,255,255,.72);max-width:360px">
-      なかまの <b style="color:var(--gold)">立ち絵をタップ</b> でこうげき。ゲージが たまると ひっさつ！<br>
-      <b style="color:#ff9a5a">「よけろ！」</b> が出たら すぐタップ。BLACKは なかまを あやつる…！ あやつられた なかまは <b style="color:#ff6a7a">タップ れんだ</b> で たすけ出そう。</div>
+      なかまの <b style="color:var(--gold)"><ruby>立<rt>た</rt></ruby>ち<ruby>絵<rt>え</rt></ruby>をタップ</b> でこうげき。ゲージが たまると ひっさつ！<br>
+      <b style="color:#ff9a5a">「よけろ！」</b> が<ruby>出<rt>で</rt></ruby>たら すぐタップ。BLACKは なかまを あやつる…！ あやつられた なかまは <b style="color:#ff6a7a">タップ れんだ</b> で たすけ<ruby>出<rt>だ</rt></ruby>そう。</div>
   </div>
 
   <div id="helpScreen" class="screen" hidden>
     <div class="title-en" style="font-size:26px">なかまの わざ</div>
-    <div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:370px">みんな こうげき力は だいたい おなじ。たたかうと <b style="color:#ffd36b">レベルアップ</b> して つよくなる。ゲージが たまると <b style="color:#ffd36b">ひっさつ</b>！</div>
+    <div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:370px">みんな こうげき<ruby>力<rt>りょく</rt></ruby>は だいたい おなじ。たたかうと <b style="color:#ffd36b">レベルアップ</b> して <ruby>強<rt>つよ</rt></ruby>くなる。ゲージが たまると <b style="color:#ffd36b">ひっさつ</b>！</div>
     <div id="typeChart" style="width:100%;max-width:370px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 12px"></div>
     <div id="helpList" class="helpList"></div>
     <button class="btn" id="helpClose">とじる</button>
@@ -247,7 +247,7 @@
 
   <!-- RPG: story window -->
   <div id="rpgStory" hidden>
-    <div class="storyBox"><div class="storyText" id="storyText"></div><div class="storyHint">タップで つぎへ ▶</div></div>
+    <div class="storyBox"><div class="storyText" id="storyText"></div><div class="storyHint">タップで <ruby>次<rt>つぎ</rt></ruby>へ ▶</div></div>
   </div>
 
   <!-- RPG: battle command UI -->
