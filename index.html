@@ -154,11 +154,7 @@
       <div class="mt"><b>ぼうけん（100体クエスト）</b><small>1戦ずつ てきを たおして レベルアップ。ぜんぶで100体。10人から 出撃を えらび、つづきから あそべる。</small></div></div>
     <div id="charLv" style="width:100%;max-width:380px"></div>
     <div id="savePanel" style="width:100%;max-width:340px;font-size:12px;color:#c9a6ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;text-align:left;line-height:1.7"></div>
-    <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center">
-      <button class="btn sub" id="saveCodeBtn" style="font-size:13px;padding:8px 14px;flex:1">きろくを ほぞん</button>
-      <button class="btn sub" id="loadCodeBtn" style="font-size:13px;padding:8px 14px;flex:1">コードで つづき</button>
-    </div>
-    <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">スマホで あそぶときは ときどき「きろくを ほぞん」で コードを コピー／スクショしておくと あんしん。</div>
+    <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">きろくは じどうで ほぞんされます。とじても だいじょうぶ。</div>
     <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center;margin-top:2px">
       <button class="btn sub" id="resetLvBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">レベルを1に もどす</button>
       <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">討伐きろくを けす</button>
@@ -456,8 +452,6 @@
     }
     document.getElementById('codeClose').onclick=function(){ el.hidden=true; };
   }
-  document.getElementById('saveCodeBtn').addEventListener('click',function(){ showCodeModal('save'); });
-  document.getElementById('loadCodeBtn').addEventListener('click',function(){ showCodeModal('load'); });
   function showResetModal(kind){ var el=document.getElementById('codeModal');
     var title=kind==='lv'?'レベルを ぜんぶ 1に もどす':'討伐きろくを けす';
     var warn=kind==='lv'?'ぜんいんの レベルが 1に もどります（もとに もどせません）。':'たおした きろくが ぜんぶ きえます（レベルは そのまま）。';
