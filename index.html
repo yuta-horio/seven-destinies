@@ -102,6 +102,14 @@
   .hubm .ha{ width:44px; height:44px; border-radius:10px; overflow:hidden; border:2px solid var(--bc,#fff); background:#1a1430; }
   .hubm span{ color:#e7dcff; }
   .hubm b{ color:#ffd36b; font-size:11px; }
+  /* TOPのなかま一覧（5列・大きめ・タイプ表示） */
+  .roster5{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px 6px; width:100%; max-width:430px; margin:0 auto; }
+  .rcell{ display:flex; flex-direction:column; align-items:center; gap:1px; cursor:pointer; }
+  .rcell .ra{ width:100%; aspect-ratio:1/1; max-width:70px; border-radius:12px; overflow:hidden; border:2.5px solid var(--bc,#fff); background:#1a1430; background-size:contain; background-repeat:no-repeat; background-position:center bottom; }
+  .rcell:active .ra{ transform:scale(.94); }
+  .rcell .rname{ font-family:var(--pop); font-size:11px; color:#e7dcff; margin-top:2px; }
+  .rcell .rlv{ font-size:11px; font-weight:800; color:#ffd36b; }
+  .rcell .rtype{ font-family:var(--pop); font-size:9px; font-weight:800; color:#1a1020; padding:0 7px; border-radius:8px; line-height:1.5; }
   #questHub{ justify-content:flex-start; gap:10px; }
   .egrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100%; max-width:460px; }
   .ecell{ position:relative; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:6px 4px 5px; cursor:pointer; transition:transform .1s,box-shadow .15s; }
@@ -170,7 +178,8 @@
     <div class="modeCard rpg" id="modeRpg"><div class="mi">📖</div>
       <div class="mt"><b>ぼうけん（100体クエスト）</b><small>1戦ずつ てきを たおして レベルアップ。ぜんぶで100体。10人から 出撃を えらび、つづきから あそべる。</small></div></div>
     <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを かう／賞品を うる</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
-    <div id="charLv" style="width:100%;max-width:380px"></div>
+    <div id="charLv" style="width:100%;max-width:430px"></div>
+    <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの あいしょうひょう を みる</button>
     <div id="savePanel" style="width:100%;max-width:340px;font-size:12px;color:#c9a6ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;text-align:left;line-height:1.7"></div>
     <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">きろくは じどうで ほぞんされます。とじても だいじょうぶ。</div>
     <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center;margin-top:2px">
@@ -468,9 +477,9 @@
       (lines?'<span style="color:#9ad6ff">さいきん</span><br>'+lines:'');
   }
   function renderCharLv(){ var el=document.getElementById('charLv'); if(!el) return;
-    el.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:5px;text-align:center">なかまの レベル（アクション・RPG 共通）</div><div class="hubParty">'+CHARS.map(function(c){ var st=cget(c.key); return '<div class="hubm"><div class="ha" style="--bc:'+c.color+'"></div><span>'+c.name+'</span><b>Lv'+st.lv+'</b></div>'; }).join('')+'</div>';
-    var has=el.querySelectorAll('.hubm .ha'); for(var i=0;i<has.length;i++) faceStyle(has[i], CHARS[i].key);
-    var cells=el.querySelectorAll('.hubm'); for(var j=0;j<cells.length;j++){ cells[j].style.cursor='pointer'; (function(key){ cells[j].addEventListener('click',function(){ showCharStat(key); }); })(CHARS[j].key); }
+    el.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:6px;text-align:center">なかまの レベル（アクション・RPG 共通）</div><div class="roster5">'+CHARS.map(function(c){ var st=cget(c.key); var T=TYPES[c.type]||{col:'#888',name:''}; return '<div class="rcell" data-k="'+c.key+'"><div class="ra" style="--bc:'+c.color+'"></div><div class="rname">'+c.name+'</div><div class="rlv">Lv'+st.lv+'</div><div class="rtype" style="background:'+T.col+'">'+T.name+'</div></div>'; }).join('')+'</div>';
+    var has=el.querySelectorAll('.rcell .ra'); for(var i=0;i<has.length;i++) faceStyle(has[i], CHARS[i].key);
+    var cells=el.querySelectorAll('.rcell'); for(var j=0;j<cells.length;j++){ (function(key){ cells[j].addEventListener('click',function(){ showCharStat(key); }); })(cells[j].getAttribute('data-k')); }
   }
   // ---------- save code (portable backup: works even on a downloaded file) ----------
   function b64enc(str){ try{ return btoa(unescape(encodeURIComponent(str))); }catch(e){ return btoa(str); } }
@@ -552,6 +561,19 @@
     [].forEach.call(el.querySelectorAll('.shopSell'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'); if(itemCount(k)>0){ CDATA.items[k]--; addCoins(ITEMS[k].sell); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#ffd36b'; m.textContent=ITEMS[k].name+' を うった！ +🪙'+ITEMS[k].sell; } SFX.rescue(); } }; });
   }
   document.getElementById('shopEntry').addEventListener('click',showShop);
+  // ---- タイプ相性 早見表 ----
+  function showTypeChart(){ var el=document.getElementById('codeModal');
+    var cycle=TYPECYCLE.map(function(t){ return '<span style="display:inline-block;padding:2px 11px;border-radius:10px;font-size:12px;font-weight:800;color:#1a1020;background:'+TYPES[t].col+'">'+TYPES[t].name+'</span>'; }).join(' <span style="color:#ffd36b">▶</span> ');
+    var rows=TYPECYCLE.map(function(t,i){ var strong=TYPECYCLE[(i+1)%5], weak=TYPECYCLE[(i+4)%5];
+      return '<div style="display:flex;align-items:center;gap:5px;justify-content:center;font-size:12px;margin:4px 0;flex-wrap:wrap"><span style="min-width:52px;text-align:center;display:inline-block;padding:2px 8px;border-radius:9px;font-weight:800;color:#1a1020;background:'+TYPES[t].col+'">'+TYPES[t].name+'</span><span style="color:#7fe0a0">→ '+TYPES[strong].name+'に つよい</span><span style="color:#ff9ec2">／ '+TYPES[weak].name+'に よわい</span></div>'; }).join('');
+    el.innerHTML='<div class="statCard"><div class="statName" style="color:#ffd36b">タイプ あいしょうひょう</div>'
+      +'<div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:320px">やじるしの さきに <b style="color:#7fe0a0">つよい</b>！<br>こうかバツグン＝ダメージ 1.6ばい／ぎゃくは いまひとつ（0.65ばい）</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:5px 3px;align-items:center;justify-content:center;margin:8px 0">'+cycle+' <span style="color:#8a80a5;font-size:10px">…けんに もどる</span></div>'
+      +'<div style="width:100%;max-width:340px">'+rows+'</div>'
+      +'<button class="btn" id="tcClose" style="font-size:15px;padding:9px 24px">とじる</button></div>';
+    el.hidden=false; document.getElementById('tcClose').onclick=function(){ el.hidden=true; };
+  }
+  document.getElementById('typeChartBtn').addEventListener('click',showTypeChart);
   // オーディオ解除（スマホは 最初の タップで AudioContext を resume しないと 音が でない）
   (function(){ function unlock(){ var a=actx(); if(!a) return; if(a.state==='suspended'){ try{ a.resume(); }catch(e){} } try{ var b=a.createBufferSource(); b.buffer=a.createBuffer(1,1,22050); b.connect(a.destination); b.start(0); }catch(e){} }
     ['pointerdown','touchend','mousedown','keydown','click'].forEach(function(ev){ document.addEventListener(ev, unlock, {passive:true}); }); })();
@@ -627,7 +649,8 @@
   function spawnBurst(x,y,color){ for(var i=0;i<9;i++){ var a=Math.random()*Math.PI*2, sp=130*(0.4+Math.random()); G.particles.push({ x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-40,age:0,life:0.4+Math.random()*0.3,r:2+Math.random()*3,color:Math.random()<0.5?color:'#fff' }); } }
   function gainExpA(s,amt){ s.exp+=amt; while(s.exp>=s.next&&s.lv<12){ s.exp-=s.next; s.lv++; s.next=Math.round(s.next*1.35); levelUpA(s); } }
   function levelUpA(s){ SFX.lvup(); s.atkAnim=0.3; var msg='Lv'+s.lv+'！'; if(s.lv===3)msg='Lv3 2れんげき！'; if(s.lv===5)msg='Lv5 パワーアップ！'; if(s.lv===8)msg='Lv8 たつじん！'; G.floaters.push({ x:s.x,y:s.y-s.h/2-10,vy:-40,age:0,life:1.1,text:msg,color:'#ffd36b',big:true }); for(var i=0;i<14;i++){ var a=Math.random()*Math.PI*2; G.particles.push({ x:s.x,y:s.y,vx:Math.cos(a)*120,vy:Math.sin(a)*120-30,age:0,life:0.6,r:3,color:'#ffe6a0' }); } }
-  var POOL={ C:['yakusou','mpwater','kakera','glass','shell','feather'], U:['allcure','bigcure','genki','silver','crystal','egg'], R:['hane','gold','ruby','sapphire','emerald'], E:['scale','lamp'], L:['star','crown'] };
+  // アクションで ドロップするのは「お宝」だけ（つかう どうぐは ショップで かう）
+  var POOL={ C:['kakera','glass','shell','feather'], U:['silver','crystal','egg'], R:['gold','ruby','sapphire','emerald'], E:['scale','lamp'], L:['star','crown'] };
   function rollDrop(en){ var r=Math.random(), tier;
     if(en.st.boss){ tier = r<0.14?'L':(r<0.55?'E':'R'); }
     else if(en.st.mid){ tier = r<0.10?'E':(r<0.50?'R':'U'); }
