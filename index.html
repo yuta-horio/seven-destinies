@@ -193,28 +193,28 @@
       <div class="title-jp">7つの<ruby>心<rt>こころ</rt></ruby>が、<ruby>世界<rt>せかい</rt></ruby>をつなぐ</div></div>
     <div style="font-family:var(--pop);font-size:14px;color:#ffd36b">どっちで <ruby>遊<rt>あそ</rt></ruby>ぶ？</div>
     <div class="modeCard action" id="modeAction"><div class="mi">⚔️</div>
-      <div class="mt"><b>アクションバトル</b><small>3<ruby>人<rt>にん</rt></ruby>で 10れんせん！たおすと <b style="color:#ffd36b">しょうひん＋コイン</b> ゲット。むずかしいよ。（レベルは <ruby>上<rt>あ</rt></ruby>がらない）</small></div></div>
+      <div class="mt"><b>アクションバトル</b><small>3<ruby>人<rt>にん</rt></ruby>で 10<ruby>連戦<rt>れんせん</rt></ruby>！たおすと <b style="color:#ffd36b"><ruby>賞品<rt>しょうひん</rt></ruby>＋コイン</b> ゲット。むずかしいよ。（レベルは <ruby>上<rt>あ</rt></ruby>がらない）</small></div></div>
     <div class="modeCard rpg" id="modeRpg"><div class="mi">📖</div>
-      <div class="mt"><b>ぼうけん（100<ruby>体<rt>たい</rt></ruby>クエスト）</b><small>1せんずつ てきを たおして レベルアップ。ぜんぶで100<ruby>体<rt>たい</rt></ruby>。10<ruby>人<rt>にん</rt></ruby>から しゅつげきを えらび、つづきから <ruby>遊<rt>あそ</rt></ruby>べる。</small></div></div>
+      <div class="mt"><b>ぼうけん（100<ruby>体<rt>たい</rt></ruby>クエスト）</b><small>1<ruby>戦<rt>せん</rt></ruby>ずつ てきを たおして レベルアップ。ぜんぶで100<ruby>体<rt>たい</rt></ruby>。10<ruby>人<rt>にん</rt></ruby>から しゅつげきを <ruby>選<rt>えら</rt></ruby>び、<ruby>続<rt>つづ</rt></ruby>きから <ruby>遊<rt>あそ</rt></ruby>べる。</small></div></div>
     <div class="modeCard quiz" id="modeQuiz"><div class="mi">📝</div>
       <div class="mt"><b>クイズ<ruby>王<rt>おう</rt></ruby>チャレンジ</b><small><ruby>国語<rt>こくご</rt></ruby>・<ruby>算数<rt>さんすう</rt></ruby>・<ruby>理科<rt>りか</rt></ruby>・<ruby>社会<rt>しゃかい</rt></ruby>・<ruby>野球<rt>やきゅう</rt></ruby>・<ruby>一般<rt>いっぱん</rt></ruby><ruby>常識<rt>じょうしき</rt></ruby>から <ruby>全<rt>ぜん</rt></ruby>10<ruby>問<rt>もん</rt></ruby>。<ruby>正解<rt>せいかい</rt></ruby>すると <b style="color:#ffd36b">コイン＋アイテム</b>！ たくさん あてると おおもうけ。</small></div></div>
-    <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを <ruby>買<rt>か</rt></ruby>う／しょうひんを <ruby>売<rt>う</rt></ruby>る</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
+    <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを <ruby>買<rt>か</rt></ruby>う／<ruby>賞品<rt>しょうひん</rt></ruby>を <ruby>売<rt>う</rt></ruby>る</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
     <div id="charLv" style="width:100%;max-width:430px"></div>
-    <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの あいしょうひょうを <ruby>見<rt>み</rt></ruby>る</button>
+    <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの <ruby>早見表<rt>はやみひょう</rt></ruby>を <ruby>見<rt>み</rt></ruby>る</button>
     <div id="savePanel" style="width:100%;max-width:340px;font-size:12px;color:#c9a6ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;text-align:left;line-height:1.7"></div>
-    <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">きろくは じどうで ほぞんされます。とじても だいじょうぶ。</div>
+    <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5"><ruby>記録<rt>きろく</rt></ruby>は <ruby>自動<rt>じどう</rt></ruby>で ほぞんされます。とじても だいじょうぶ。</div>
     <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center;margin-top:2px">
       <button class="btn sub" id="resetLvBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">レベルを1に もどす</button>
-      <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85"><ruby>討伐<rt>とうばつ</rt></ruby>きろくを <ruby>消<rt>け</rt></ruby>す</button>
+      <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85"><ruby>討伐<rt>とうばつ</rt></ruby><ruby>記録<rt>きろく</rt></ruby>を <ruby>消<rt>け</rt></ruby>す</button>
     </div>
-    <div style="width:100%;max-width:340px;font-size:9px;color:#7a7090;text-align:center">※パスワードが ひつよう（おうちの<ruby>人<rt>ひと</rt></ruby>に <ruby>聞<rt>き</rt></ruby>いてね）</div>
+    <div style="width:100%;max-width:340px;font-size:9px;color:#7a7090;text-align:center">※パスワードが <ruby>必要<rt>ひつよう</rt></ruby>（おうちの<ruby>人<rt>ひと</rt></ruby>に <ruby>聞<rt>き</rt></ruby>いてね）</div>
   </div>
 
   <!-- ACTION: character select -->
   <div id="titleScreen" class="screen" hidden>
     <div class="title-en" style="font-size:28px">アクションバトル</div>
     <div class="title-lead">まおう <b>BLACK</b> が <ruby>世界<rt>せかい</rt></ruby>を のっとろうとしている！<br>
-      <span style="color:#c9a6ff;font-size:.85em">なかまを 3<ruby>人<rt>にん</rt></ruby> えらんで たたかおう。てきを たおすと レベルアップ！</span></div>
+      <span style="color:#c9a6ff;font-size:.85em"><ruby>仲間<rt>なかま</rt></ruby>を 3<ruby>人<rt>にん</rt></ruby> <ruby>選<rt>えら</rt></ruby>んで <ruby>戦<rt>たたか</rt></ruby>おう。てきを たおすと レベルアップ！</span></div>
     <div class="selInfo" id="selInfo"></div>
     <div class="roster" id="rosterBox"></div>
     <div><div class="fieldlabel" style="margin-bottom:6px">プレイヤー<ruby>名<rt>めい</rt></ruby></div>
@@ -222,13 +222,13 @@
     <button class="btn" id="startBtn">ぼうけんを <ruby>始<rt>はじ</rt></ruby>める</button>
     <button class="btn sub" id="helpBtn">わざ・のうりょくを <ruby>見<rt>み</rt></ruby>る</button>
     <div style="font-size:11px;line-height:1.7;color:rgba(255,255,255,.72);max-width:360px">
-      なかまの <b style="color:var(--gold)"><ruby>立<rt>た</rt></ruby>ち<ruby>絵<rt>え</rt></ruby>をタップ</b> でこうげき。ゲージが たまると ひっさつ！<br>
-      <b style="color:#ff9a5a">「よけろ！」</b> が<ruby>出<rt>で</rt></ruby>たら すぐタップ。BLACKは なかまを あやつる…！ あやつられた なかまは <b style="color:#ff6a7a">タップ れんだ</b> で たすけ<ruby>出<rt>だ</rt></ruby>そう。</div>
+      <ruby>仲間<rt>なかま</rt></ruby>の <b style="color:var(--gold)"><ruby>立<rt>た</rt></ruby>ち<ruby>絵<rt>え</rt></ruby>をタップ</b> でこうげき。ゲージが たまると <ruby>必殺<rt>ひっさつ</rt></ruby>！<br>
+      <b style="color:#ff9a5a">「よけろ！」</b> が<ruby>出<rt>で</rt></ruby>たら すぐタップ。BLACKは <ruby>仲間<rt>なかま</rt></ruby>を あやつる…！ あやつられた <ruby>仲間<rt>なかま</rt></ruby>は <b style="color:#ff6a7a">タップ れんだ</b> で たすけ<ruby>出<rt>だ</rt></ruby>そう。</div>
   </div>
 
   <div id="helpScreen" class="screen" hidden>
-    <div class="title-en" style="font-size:26px">なかまの わざ</div>
-    <div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:370px">みんな こうげき<ruby>力<rt>りょく</rt></ruby>は だいたい おなじ。たたかうと <b style="color:#ffd36b">レベルアップ</b> して <ruby>強<rt>つよ</rt></ruby>くなる。ゲージが たまると <b style="color:#ffd36b">ひっさつ</b>！</div>
+    <div class="title-en" style="font-size:26px"><ruby>仲間<rt>なかま</rt></ruby>の わざ</div>
+    <div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:370px">みんな こうげき<ruby>力<rt>りょく</rt></ruby>は だいたい おなじ。<ruby>戦<rt>たたか</rt></ruby>うと <b style="color:#ffd36b">レベルアップ</b> して <ruby>強<rt>つよ</rt></ruby>くなる。ゲージが たまると <b style="color:#ffd36b"><ruby>必殺<rt>ひっさつ</rt></ruby></b>！</div>
     <div id="typeChart" style="width:100%;max-width:370px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 12px"></div>
     <div id="helpList" class="helpList"></div>
     <button class="btn" id="helpClose">とじる</button>
@@ -236,10 +236,10 @@
 
   <!-- RPG: party pick -->
   <div id="rpgPick" class="screen" hidden>
-    <div class="title-en" style="font-size:24px">たたかう なかまを えらぶ</div>
+    <div class="title-en" style="font-size:24px"><ruby>戦<rt>たたか</rt></ruby>う <ruby>仲間<rt>なかま</rt></ruby>を <ruby>選<rt>えら</rt></ruby>ぶ</div>
     <div class="selInfo" id="pickInfo"></div>
     <div class="roster" id="pickBox"></div>
-    <button class="btn" id="pickStart">この なかまで！</button>
+    <button class="btn" id="pickStart">この <ruby>仲間<rt>なかま</rt></ruby>で！</button>
   </div>
 
   <!-- RPG: quest hub -->
@@ -344,16 +344,16 @@
   var GEN=[[8,'gQuick'],[24,'gGuard'],[34,'gCheer'],[46,'gHealS'],[60,'gAllatk'],[76,'gHealA'],[90,'gBig']]; // 共通7わざ（固有3＋共通7＝各10）
 
   var CHARS=[
-    { key:'sakutaro', name:'咲太朗',  color:'#3f7bff', fx:'slash',   ult:'dmg',  skill:'いなずま斬り',       ability:'つるぎの バランス型。ひっさつ＝大ダメージ', learn:[[1,'slashA'],[15,'slashB'],[45,'slashC']] },
-    { key:'papa',     name:'パパ',    color:'#e0642e', fx:'slash',   ult:'dmg',  skill:'ちからの一げき',     ability:'ちから自まん。ひっさつ＝大ダメージ',       learn:[[1,'punchA'],[15,'guardAll'],[45,'punchB']] },
-    { key:'ayaka',    name:'ママ',    color:'#ffcf5a', fx:'light',   ult:'heal', skill:'いやしのひかり',     ability:'ひっさつ＝ハートを 1つ かいふく',           learn:[[1,'cookA'],[35,'healB']] },
-    { key:'haruka',   name:'遥',      color:'#2aa0ff', fx:'gun',     ult:'dmg',  skill:'れんしゃビーム',     ability:'とおくから こうげき。ひっさつ＝大ダメージ', learn:[[1,'gunA'],[18,'gunB'],[55,'gunC']] },
-    { key:'kapparu',  name:'カッパル', color:'#4be0a0', fx:'water',   ult:'dmg',  skill:'みずでっぽう',       ability:'すばやい みず。ひっさつ＝大ダメージ',       learn:[[1,'waterA'],[20,'waterB']] },
-    { key:'hayu',     name:'はゆ',    color:'#ff7ab8', fx:'light',   ult:'heal', skill:'きぼうのひかり',     ability:'ひっさつ＝ハートを 1つ かいふく',           learn:[[1,'healA'],[12,'lightA'],[40,'healB']] },
-    { key:'kika',     name:'きか',    color:'#a06bff', fx:'heart',   ult:'dmg',  skill:'あいのだいまほう',   ability:'ハートの魔法。ひっさつ＝大ダメージ',       learn:[[1,'heartA'],[22,'heartB'],[60,'heartC']] },
-    { key:'subaru',   name:'スバル',  color:'#2b6bff', fx:'summon',  ult:'dmg',  skill:'モンスターしょうかん', ability:'なかまを よぶ。ひっさつ＝大ダメージ',       learn:[[1,'summonA'],[30,'summonB']] },
-    { key:'yura',     name:'ゆら',    color:'#ff9ec2', fx:'cheer',   ult:'buff', skill:'みんなでおうえん',   ability:'ひっさつ＝5びょう みんな こうげきUP',       learn:[[1,'cheerA'],[20,'cheerB']] },
-    { key:'ryudou',   name:'リュウドウ', color:'#ffcf4a', fx:'rainbow', ult:'dmg', skill:'にじのブレス',       ability:'にじの龍。ひっさつ＝さいきょう ダメージ',   learn:[[1,'rainA'],[70,'rainB']] }
+    { key:'sakutaro', name:'咲太朗',  color:'#3f7bff', fx:'slash',   ult:'dmg',  skill:'いなずま斬り',       ability:'つるぎの バランス<ruby>型<rt>がた</rt></ruby>。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ', learn:[[1,'slashA'],[15,'slashB'],[45,'slashC']] },
+    { key:'papa',     name:'パパ',    color:'#e0642e', fx:'slash',   ult:'dmg',  skill:'ちからの一げき',     ability:'ちから<ruby>自<rt>じ</rt></ruby>まん。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ',       learn:[[1,'punchA'],[15,'guardAll'],[45,'punchB']] },
+    { key:'ayaka',    name:'ママ',    color:'#ffcf5a', fx:'light',   ult:'heal', skill:'いやしのひかり',     ability:'<ruby>必殺<rt>ひっさつ</rt></ruby>＝ハートを 1つ かいふく',           learn:[[1,'cookA'],[35,'healB']] },
+    { key:'haruka',   name:'遥',      color:'#2aa0ff', fx:'gun',     ult:'dmg',  skill:'れんしゃビーム',     ability:'とおくから こうげき。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ', learn:[[1,'gunA'],[18,'gunB'],[55,'gunC']] },
+    { key:'kapparu',  name:'カッパル', color:'#4be0a0', fx:'water',   ult:'dmg',  skill:'みずでっぽう',       ability:'すばやい みず。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ',       learn:[[1,'waterA'],[20,'waterB']] },
+    { key:'hayu',     name:'はゆ',    color:'#ff7ab8', fx:'light',   ult:'heal', skill:'きぼうのひかり',     ability:'<ruby>必殺<rt>ひっさつ</rt></ruby>＝ハートを 1つ かいふく',           learn:[[1,'healA'],[12,'lightA'],[40,'healB']] },
+    { key:'kika',     name:'きか',    color:'#a06bff', fx:'heart',   ult:'dmg',  skill:'あいのだいまほう',   ability:'ハートの まほう。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ',       learn:[[1,'heartA'],[22,'heartB'],[60,'heartC']] },
+    { key:'subaru',   name:'スバル',  color:'#2b6bff', fx:'summon',  ult:'dmg',  skill:'モンスターしょうかん', ability:'<ruby>仲間<rt>なかま</rt></ruby>を よぶ。<ruby>必殺<rt>ひっさつ</rt></ruby>＝<ruby>大<rt>だい</rt></ruby>ダメージ',       learn:[[1,'summonA'],[30,'summonB']] },
+    { key:'yura',     name:'ゆら',    color:'#ff9ec2', fx:'cheer',   ult:'buff', skill:'みんなでおうえん',   ability:'<ruby>必殺<rt>ひっさつ</rt></ruby>＝5びょう みんな こうげきUP',       learn:[[1,'cheerA'],[20,'cheerB']] },
+    { key:'ryudou',   name:'リュウドウ', color:'#ffcf4a', fx:'rainbow', ult:'dmg', skill:'にじのブレス',       ability:'にじの りゅう。<ruby>必殺<rt>ひっさつ</rt></ruby>＝さいきょう ダメージ',   learn:[[1,'rainA'],[70,'rainB']] }
   ];
   // 各キャラの「シグネチャー」おもしろスキル
   var SIG={ sakutaro:[30,'multiA'], papa:[30,'trueA'], ayaka:[25,'revive'], haruka:[28,'stunA'], kapparu:[30,'poisonA'], hayu:[26,'regenA'], kika:[33,'drainA'], subaru:[24,'lifeA'] };
@@ -475,7 +475,7 @@
   var rosterBox=document.getElementById('rosterBox'), selInfoEl=document.getElementById('selInfo'), startBtnEl=document.getElementById('startBtn'), cellMap={};
   CHARS.forEach(function(c){ var cell=document.createElement('div'); cell.className='rosterCell'; cell.style.setProperty('--bc',c.color); cell.innerHTML='<div class="ravatar" style="--bc:'+c.color+'"></div><div class="rn">'+c.name+'</div>'; faceStyle(cell.querySelector('.ravatar'),c.key); cell.addEventListener('click',function(){ toggleSel(c.key); }); rosterBox.appendChild(cell); cellMap[c.key]=cell; });
   function toggleSel(k){ var i=selected.indexOf(k); if(i>=0)selected.splice(i,1); else { if(selected.length>=MAXSEL)return; selected.push(k); } refreshSel(); }
-  function refreshSel(){ CHARS.forEach(function(c){ var cell=cellMap[c.key], on=selected.indexOf(c.key)>=0; cell.classList.toggle('sel',on); cell.classList.toggle('dim',!on&&selected.length>=MAXSEL); }); var n=selected.length; selInfoEl.innerHTML='3人 えらぼう！ <small>いま '+n+'人'+(n<MAXSEL?'（あと '+(MAXSEL-n)+'人）':'　じゅんび OK！')+'</small>'; startBtnEl.disabled=(n!==MAXSEL); }
+  function refreshSel(){ CHARS.forEach(function(c){ var cell=cellMap[c.key], on=selected.indexOf(c.key)>=0; cell.classList.toggle('sel',on); cell.classList.toggle('dim',!on&&selected.length>=MAXSEL); }); var n=selected.length; selInfoEl.innerHTML='3<ruby>人<rt>にん</rt></ruby> <ruby>選<rt>えら</rt></ruby>ぼう！ <small>いま '+n+'<ruby>人<rt>にん</rt></ruby>'+(n<MAXSEL?'（あと '+(MAXSEL-n)+'<ruby>人<rt>にん</rt></ruby>）':'　じゅんび OK！')+'</small>'; startBtnEl.disabled=(n!==MAXSEL); }
   refreshSel();
 
   // ---------- screen refs ----------
@@ -491,16 +491,16 @@
   function nowStr(){ try{ var d=new Date(); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){ return ''; } }
   function record(mode,result,detail){ SAVE.hist.unshift({ d:nowStr(), m:mode, r:result, x:detail||'' }); if(SAVE.hist.length>15) SAVE.hist.length=15; persist(); renderSave(); }
   function renderSave(){ renderCharLv(); renderCoins(); var el=document.getElementById('savePanel'); if(!el) return;
-    if(!SAVE.plays){ el.innerHTML='<b style="color:#ffd36b">これまでの きろく</b><br>まだ きろくは ありません。あそぶと たまっていくよ。'; return; }
-    var act = SAVE.bestStage? ('アクション最高 ステージ'+SAVE.bestStage+(SAVE.bestTime?'・最短'+SAVE.bestTime+'秒':'')) : '';
-    var rpg = SAVE.bestRpgLv? ('RPG最高 Lv'+SAVE.bestRpgLv) : '';
+    if(!SAVE.plays){ el.innerHTML='<b style="color:#ffd36b">これまでの <ruby>記録<rt>きろく</rt></ruby></b><br>まだ <ruby>記録<rt>きろく</rt></ruby>は ありません。<ruby>遊<rt>あそ</rt></ruby>ぶと たまっていくよ。'; return; }
+    var act = SAVE.bestStage? ('アクション<ruby>最高<rt>さいこう</rt></ruby> ステージ'+SAVE.bestStage+(SAVE.bestTime?'・<ruby>最短<rt>さいたん</rt></ruby>'+SAVE.bestTime+'<ruby>秒<rt>びょう</rt></ruby>':'')) : '';
+    var rpg = SAVE.bestRpgLv? ('RPG<ruby>最高<rt>さいこう</rt></ruby> Lv'+SAVE.bestRpgLv) : '';
     var lines = SAVE.hist.slice(0,4).map(function(h){ return '・'+h.d+' '+(h.m==='action'?'⚔':'📖')+' '+h.r+(h.x?'（'+h.x+'）':''); }).join('<br>');
-    el.innerHTML='<b style="color:#ffd36b">これまでの きろく</b>　あそんだ '+SAVE.plays+'回／クリア '+SAVE.clears+'回<br>'+
+    el.innerHTML='<b style="color:#ffd36b">これまでの <ruby>記録<rt>きろく</rt></ruby></b>　<ruby>遊<rt>あそ</rt></ruby>んだ '+SAVE.plays+'<ruby>回<rt>かい</rt></ruby>／クリア '+SAVE.clears+'<ruby>回<rt>かい</rt></ruby><br>'+
       (act?act+'<br>':'')+(rpg?rpg+'<br>':'')+
-      (lines?'<span style="color:#9ad6ff">さいきん</span><br>'+lines:'');
+      (lines?'<span style="color:#9ad6ff"><ruby>最近<rt>さいきん</rt></ruby></span><br>'+lines:'');
   }
   function renderCharLv(){ var el=document.getElementById('charLv'); if(!el) return;
-    el.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:6px;text-align:center">なかまの レベル（アクション・RPG 共通）</div><div class="roster5">'+CHARS.map(function(c){ var st=cget(c.key); var T=TYPES[c.type]||{col:'#888',name:''}; return '<div class="rcell" data-k="'+c.key+'"><div class="ra" style="--bc:'+c.color+'"></div><div class="rname">'+c.name+'</div><div class="rlv">Lv'+st.lv+'</div><div class="rtype" style="background:'+T.col+'">'+T.name+'</div></div>'; }).join('')+'</div>';
+    el.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:6px;text-align:center"><ruby>仲間<rt>なかま</rt></ruby>の レベル（アクション・RPG <ruby>共通<rt>きょうつう</rt></ruby>）</div><div class="roster5">'+CHARS.map(function(c){ var st=cget(c.key); var T=TYPES[c.type]||{col:'#888',name:''}; return '<div class="rcell" data-k="'+c.key+'"><div class="ra" style="--bc:'+c.color+'"></div><div class="rname">'+c.name+'</div><div class="rlv">Lv'+st.lv+'</div><div class="rtype" style="background:'+T.col+'">'+T.name+'</div></div>'; }).join('')+'</div>';
     var has=el.querySelectorAll('.rcell .ra'); for(var i=0;i<has.length;i++) faceStyle(has[i], CHARS[i].key);
     var cells=el.querySelectorAll('.rcell'); for(var j=0;j<cells.length;j++){ (function(key){ cells[j].addEventListener('click',function(){ showCharStat(key); }); })(cells[j].getAttribute('data-k')); }
   }
@@ -542,19 +542,19 @@
     document.getElementById('codeClose').onclick=function(){ el.hidden=true; };
   }
   function showResetModal(kind){ var el=document.getElementById('codeModal');
-    var title=kind==='lv'?'レベルを ぜんぶ 1に もどす':'討伐きろくを けす';
-    var warn=kind==='lv'?'ぜんいんの レベルが 1に もどります（もとに もどせません）。':'たおした きろくが ぜんぶ きえます（レベルは そのまま）。';
+    var title=kind==='lv'?'レベルを <ruby>全部<rt>ぜんぶ</rt></ruby> 1に もどす':'<ruby>討伐<rt>とうばつ</rt></ruby><ruby>記録<rt>きろく</rt></ruby>を <ruby>消<rt>け</rt></ruby>す';
+    var warn=kind==='lv'?'<ruby>全員<rt>ぜんいん</rt></ruby>の レベルが 1に もどります（もとに もどせません）。':'たおした <ruby>記録<rt>きろく</rt></ruby>が <ruby>全部<rt>ぜんぶ</rt></ruby> きえます（レベルは そのまま）。';
     el.innerHTML='<div class="statCard"><div class="statName" style="color:#ff9ec2">'+title+'</div>'
       +'<div style="font-size:12px;color:#c9a6ff;line-height:1.7;max-width:300px">'+warn+'<br>パスワードを いれてね。</div>'
       +'<input id="pwIn" type="tel" inputmode="numeric" placeholder="パスワード" style="width:170px;font-size:22px;text-align:center;padding:8px;border-radius:10px;border:1px solid #7a6bd6;background:#120c22;color:#fff;letter-spacing:6px">'
       +'<div id="pwMsg" style="font-size:12px;color:#ff9ec2;min-height:14px"></div>'
-      +'<button class="btn" id="pwDo" style="font-size:15px;padding:9px 24px">じっこう</button>'
+      +'<button class="btn" id="pwDo" style="font-size:15px;padding:9px 24px">・<ruby>実行<rt>じっこう</rt></ruby>・</button>'
       +'<button class="btn sub" id="pwClose" style="font-size:14px">やめる</button></div>';
     el.hidden=false; var inp=document.getElementById('pwIn'); try{ inp.focus(); }catch(e){}
     document.getElementById('pwDo').onclick=function(){ var v=(inp.value||'').trim(); if(v!=='1001'){ document.getElementById('pwMsg').textContent='パスワードが ちがうよ'; inp.value=''; return; }
       if(kind==='lv'){ CHARS.forEach(function(c){ CDATA.chars[c.key]={lv:1,exp:0,learned:[],equipped:[]}; ensureLearn(c.key); }); csave(); }
       else { CDATA.quest={progress:0,beaten:{}}; csave(); if(R){ R.beaten={}; R.progress=0; } }
-      renderSave(); el.innerHTML='<div class="statCard"><div class="statName" style="color:#7fe0a0">かんりょう！</div><div style="font-size:13px;color:#c9a6ff;line-height:1.8;max-width:300px">'+(kind==='lv'?'ぜんいん レベル1に もどしました。':'討伐きろくを けしました。')+'</div><button class="btn" id="pwOk" style="font-size:15px;padding:9px 24px">OK</button></div>'; document.getElementById('pwOk').onclick=function(){ el.hidden=true; }; };
+      renderSave(); el.innerHTML='<div class="statCard"><div class="statName" style="color:#7fe0a0"><ruby>完了<rt>かんりょう</rt></ruby>！</div><div style="font-size:13px;color:#c9a6ff;line-height:1.8;max-width:300px">'+(kind==='lv'?'<ruby>全員<rt>ぜんいん</rt></ruby> レベル1に もどしました。':'<ruby>討伐<rt>とうばつ</rt></ruby><ruby>記録<rt>きろく</rt></ruby>を けしました。')+'</div><button class="btn" id="pwOk" style="font-size:15px;padding:9px 24px">OK</button></div>'; document.getElementById('pwOk').onclick=function(){ el.hidden=true; }; };
     document.getElementById('pwClose').onclick=function(){ el.hidden=true; };
   }
   document.getElementById('resetLvBtn').addEventListener('click',function(){ showResetModal('lv'); });
@@ -564,24 +564,24 @@
   var shopTab='buy';
   function showShop(){ MODE='menu'; hideAll(); var el=document.getElementById('shopScreen'); el.hidden=false; topBtn.hidden=false; drawShop(); }
   function drawShop(){ var el=document.getElementById('shopScreen'); var coins=CDATA.coins||0;
-    var talk = shopTab==='buy' ? 'いらっしゃい。ほしい どうぐは あるかな？' : 'ほう、いい 賞品を もっとるな。かいとろう。';
+    var talk = shopTab==='buy' ? 'いらっしゃい。ほしい どうぐは あるかな？' : 'ほう、いい <ruby>賞品<rt>しょうひん</rt></ruby>を もっとるな。かいとろう。';
     var listHtml='';
-    if(shopTab==='buy'){ listHtml=ITEMORDER.filter(function(k){return ITEMS[k].buy;}).map(function(k){ var it=ITEMS[k],can=coins>=it.buy; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b><small>'+it.desc+'（もちもの '+itemCount(k)+'）</small></div><button class="btn '+(can?'':'sub')+' shopBuy" data-k="'+k+'" '+(can?'':'disabled')+' style="font-size:13px;padding:6px 12px">🪙'+it.buy+'</button></div>'; }).join('');
+    if(shopTab==='buy'){ listHtml=ITEMORDER.filter(function(k){return ITEMS[k].buy;}).map(function(k){ var it=ITEMS[k],can=coins>=it.buy; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b><small>'+it.desc+'（<ruby>持<rt>も</rt></ruby>ちもの '+itemCount(k)+'）</small></div><button class="btn '+(can?'':'sub')+' shopBuy" data-k="'+k+'" '+(can?'':'disabled')+' style="font-size:13px;padding:6px 12px">🪙'+it.buy+'</button></div>'; }).join('');
     } else { var owned=ITEMORDER.filter(function(k){return itemCount(k)>0;});
-      listHtml = owned.length ? owned.map(function(k){ var it=ITEMS[k]; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b> <span style="color:'+RARCOL[it.rar]+';font-size:10px">'+RARNAME[it.rar]+'</span> ×'+itemCount(k)+'<small>'+it.desc+'</small></div><button class="btn shopSell" data-k="'+k+'" style="font-size:13px;padding:6px 12px">うる 🪙'+it.sell+'</button></div>'; }).join('') : '<div style="color:#c9a6ff;font-size:13px;padding:16px">うれる 賞品が ない。<br>アクションバトルで あつめよう！</div>';
+      listHtml = owned.length ? owned.map(function(k){ var it=ITEMS[k]; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b> <span style="color:'+RARCOL[it.rar]+';font-size:10px">'+RARNAME[it.rar]+'</span> ×'+itemCount(k)+'<small>'+it.desc+'</small></div><button class="btn shopSell" data-k="'+k+'" style="font-size:13px;padding:6px 12px"><ruby>売<rt>う</rt></ruby>る 🪙'+it.sell+'</button></div>'; }).join('') : '<div style="color:#c9a6ff;font-size:13px;padding:16px"><ruby>売<rt>う</rt></ruby>れる <ruby>賞品<rt>しょうひん</rt></ruby>が ない。<br>アクションバトルで あつめよう！</div>';
     }
     el.innerHTML='<div class="title-en" style="font-size:22px">ショップ</div>'
       +'<div class="shopHead"><div class="ojii">👴</div><div class="bubble">'+talk+'</div></div>'
       +'<div class="coinBig">🪙 '+coins+' コイン</div>'
-      +'<div class="shopTabs"><button class="stab '+(shopTab==='buy'?'on':'')+'" id="tabBuy">かう</button><button class="stab '+(shopTab==='sell'?'on':'')+'" id="tabSell">うる</button></div>'
+      +'<div class="shopTabs"><button class="stab '+(shopTab==='buy'?'on':'')+'" id="tabBuy"><ruby>買<rt>か</rt></ruby>う</button><button class="stab '+(shopTab==='sell'?'on':'')+'" id="tabSell"><ruby>売<rt>う</rt></ruby>る</button></div>'
       +'<div class="shopList">'+listHtml+'</div>'
       +'<div id="shopMsg" style="font-size:12px;color:#7fe0a0;min-height:16px"></div>'
       +'<button class="btn sub" id="shopClose" style="font-size:15px">とじる</button>';
     document.getElementById('tabBuy').onclick=function(){ shopTab='buy'; drawShop(); };
     document.getElementById('tabSell').onclick=function(){ shopTab='sell'; drawShop(); };
     document.getElementById('shopClose').onclick=function(){ el.hidden=true; toTop(); };
-    [].forEach.call(el.querySelectorAll('.shopBuy'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'), it=ITEMS[k]; if((CDATA.coins||0)>=it.buy){ addCoins(-it.buy); addItem(k,1); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#7fe0a0'; m.textContent=it.emoji+it.name+' を かった！'; } SFX.rescue(); } }; });
-    [].forEach.call(el.querySelectorAll('.shopSell'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'); if(itemCount(k)>0){ CDATA.items[k]--; addCoins(ITEMS[k].sell); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#ffd36b'; m.textContent=ITEMS[k].name+' を うった！ +🪙'+ITEMS[k].sell; } SFX.rescue(); } }; });
+    [].forEach.call(el.querySelectorAll('.shopBuy'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'), it=ITEMS[k]; if((CDATA.coins||0)>=it.buy){ addCoins(-it.buy); addItem(k,1); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#7fe0a0'; m.textContent=it.emoji+it.name+' を 買った！'; } SFX.rescue(); } }; });
+    [].forEach.call(el.querySelectorAll('.shopSell'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'); if(itemCount(k)>0){ CDATA.items[k]--; addCoins(ITEMS[k].sell); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#ffd36b'; m.textContent=ITEMS[k].name+' を 売った！ +🪙'+ITEMS[k].sell; } SFX.rescue(); } }; });
   }
   document.getElementById('shopEntry').addEventListener('click',showShop);
 
@@ -647,9 +647,9 @@
   function showTypeChart(){ var el=document.getElementById('codeModal');
     var cycle=TYPECYCLE.map(function(t){ return '<span style="display:inline-block;padding:2px 11px;border-radius:10px;font-size:12px;font-weight:800;color:#1a1020;background:'+TYPES[t].col+'">'+TYPES[t].name+'</span>'; }).join(' <span style="color:#ffd36b">▶</span> ');
     var rows=TYPECYCLE.map(function(t,i){ var strong=TYPECYCLE[(i+1)%5], weak=TYPECYCLE[(i+4)%5];
-      return '<div style="display:flex;align-items:center;gap:5px;justify-content:center;font-size:12px;margin:4px 0;flex-wrap:wrap"><span style="min-width:52px;text-align:center;display:inline-block;padding:2px 8px;border-radius:9px;font-weight:800;color:#1a1020;background:'+TYPES[t].col+'">'+TYPES[t].name+'</span><span style="color:#7fe0a0">→ '+TYPES[strong].name+'に つよい</span><span style="color:#ff9ec2">／ '+TYPES[weak].name+'に よわい</span></div>'; }).join('');
-    el.innerHTML='<div class="statCard"><div class="statName" style="color:#ffd36b">タイプ あいしょうひょう</div>'
-      +'<div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:320px">やじるしの さきに <b style="color:#7fe0a0">つよい</b>！<br>こうかバツグン＝ダメージ 1.6ばい／ぎゃくは いまひとつ（0.65ばい）</div>'
+      return '<div style="display:flex;align-items:center;gap:5px;justify-content:center;font-size:12px;margin:4px 0;flex-wrap:wrap"><span style="min-width:52px;text-align:center;display:inline-block;padding:2px 8px;border-radius:9px;font-weight:800;color:#1a1020;background:'+TYPES[t].col+'">'+TYPES[t].name+'</span><span style="color:#7fe0a0">→ '+TYPES[strong].name+'に <ruby>強<rt>つよ</rt></ruby>い</span><span style="color:#ff9ec2">／ '+TYPES[weak].name+'に <ruby>弱<rt>よわ</rt></ruby>い</span></div>'; }).join('');
+    el.innerHTML='<div class="statCard"><div class="statName" style="color:#ffd36b">タイプ <ruby>早見表<rt>はやみひょう</rt></ruby></div>'
+      +'<div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:320px">やじるしの さきに <b style="color:#7fe0a0"><ruby>強<rt>つよ</rt></ruby>い</b>！<br>こうかバツグン＝ダメージ 1.6ばい／ぎゃくは いまひとつ（0.65ばい）</div>'
       +'<div style="display:flex;flex-wrap:wrap;gap:5px 3px;align-items:center;justify-content:center;margin:8px 0">'+cycle+' <span style="color:#8a80a5;font-size:10px">…けんに もどる</span></div>'
       +'<div style="width:100%;max-width:340px">'+rows+'</div>'
       +'<button class="btn" id="tcClose" style="font-size:15px;padding:9px 24px">とじる</button></div>';
@@ -663,17 +663,17 @@
   function showCharStat(key){ var c=byKey(key), st=cget(key), s=statsFor(st.lv); ensureLearn(key);
     function row(l,v){ return '<div class="statRow"><span>'+l+'</span><b>'+v+'</b></div>'; }
     var learnedH = st.learned.length ? st.learned.map(function(k){ var on=st.equipped.indexOf(k)>=0; return '<button class="skillBtn'+(on?' on':'')+'" data-sk="'+k+'">'+(on?'★ ':'○ ')+SKILLS[k].name+'<small>MP'+SKILLS[k].mp+'</small></button>'; }).join('') : '<span style="color:#c9a6ff">まだ ない</span>';
-    var ultTxt={dmg:'大ダメージ',heal:'ハートを かいふく',buff:'みんな こうげきUP'}[c.ult]||'';
+    var ultTxt={dmg:'<ruby>大<rt>だい</rt></ruby>ダメージ',heal:'ハートを かいふく',buff:'みんな こうげきUP'}[c.ult]||'';
     var el=document.getElementById('charStat');
     el.innerHTML='<div class="statCard">'
       +'<canvas id="statCv" width="200" height="220"></canvas>'
       +'<div class="statName" style="color:'+c.color+'">'+c.name+'</div>'
       +'<div style="margin:3px 0 1px">'+typePill(c.type)+'</div>'
       +'<div class="statRole">'+(c.ability||'')+'</div>'
-      +'<div class="statLv">Lv '+st.lv+(st.lv<100?'　つぎまで '+Math.max(0,nextExp(st.lv)-st.exp)+' けいけん':'　（さいだいレベル）')+'</div>'
-      +'<div class="statGrid">'+row('HP',s.hpMax)+row('MP',s.mpMax)+row('こうげき',s.atk)+row('ぼうぎょ',s.def)+row('すばやさ',s.spd)+row('おぼえた',st.learned.length+'／'+c.learn.length)+'</div>'
-      +'<div class="statSkills"><b>とくぎ</b>　つかえるのは 5つまで（★＝セット中／タップで へんこう）<div style="font-size:10px;color:#9ad6ff;margin:2px 0 4px">いま '+st.equipped.length+'／'+EQMAX+' セット中</div><div class="skillList">'+learnedH+'</div><div class="skillWarn" style="font-size:10px;color:#ff9ec2;min-height:12px"></div></div>'
-      +'<div class="statUlt">ひっさつ（'+c.skill+'）：'+ultTxt+'</div>'
+      +'<div class="statLv">Lv '+st.lv+(st.lv<100?'　<ruby>次<rt>つぎ</rt></ruby>まで '+Math.max(0,nextExp(st.lv)-st.exp)+' けいけん':'　（<ruby>最大<rt>さいだい</rt></ruby>レベル）')+'</div>'
+      +'<div class="statGrid">'+row('HP',s.hpMax)+row('MP',s.mpMax)+row('こうげき',s.atk)+row('ぼうぎょ',s.def)+row('すばやさ',s.spd)+row('<ruby>覚<rt>おぼ</rt></ruby>えた',st.learned.length+'／'+c.learn.length)+'</div>'
+      +'<div class="statSkills"><b>とくぎ</b>　<ruby>使<rt>つか</rt></ruby>えるのは 5つまで（★＝セット<ruby>中<rt>ちゅう</rt></ruby>／タップで へんこう）<div style="font-size:10px;color:#9ad6ff;margin:2px 0 4px">いま '+st.equipped.length+'／'+EQMAX+' セット<ruby>中<rt>ちゅう</rt></ruby></div><div class="skillList">'+learnedH+'</div><div class="skillWarn" style="font-size:10px;color:#ff9ec2;min-height:12px"></div></div>'
+      +'<div class="statUlt"><ruby>必殺<rt>ひっさつ</rt></ruby>（'+c.skill+'）：'+ultTxt+'</div>'
       +'<button class="btn" id="statClose" style="font-size:16px;padding:10px 26px">とじる</button></div>';
     el.hidden=false;
     var sbtns=el.querySelectorAll('.skillBtn'); for(var q=0;q<sbtns.length;q++){ (function(btn){ btn.addEventListener('click',function(){ var sk=btn.getAttribute('data-sk'); var ok=setEquip(key,sk); if(ok===false){ var w=el.querySelector('.skillWarn'); if(w) w.textContent='※ セットは 5つまで。どれか はずしてね'; return; } showCharStat(key); }); })(sbtns[q]); }
@@ -702,7 +702,7 @@
   document.getElementById('helpBtn').addEventListener('click',function(){ var helpList=document.getElementById('helpList');
     var tc=document.getElementById('typeChart'); if(tc && !tc.childElementCount){ var order=TYPECYCLE.map(typePill).join(' <span style="color:#ffd36b">▶</span> ');
       tc.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:4px;text-align:center">タイプの あいしょう</div>'
-        +'<div style="font-size:11px;color:#c9a6ff;line-height:1.6;margin-bottom:7px;text-align:center">やじるしの さきに <b style="color:#7fe0a0">つよい</b>！（こうかバツグン＝1.6ばい／ぎゃくは いまひとつ）</div>'
+        +'<div style="font-size:11px;color:#c9a6ff;line-height:1.6;margin-bottom:7px;text-align:center">やじるしの さきに <b style="color:#7fe0a0"><ruby>強<rt>つよ</rt></ruby>い</b>！（こうかバツグン＝1.6ばい／ぎゃくは いまひとつ）</div>'
         +'<div style="display:flex;flex-wrap:wrap;gap:4px 3px;align-items:center;justify-content:center">'+order+' <span style="color:#8a80a5;font-size:10px">…けんに もどる</span></div>'; }
     if(!helpList.childElementCount){ CHARS.forEach(function(c){ var row=document.createElement('div'); row.className='helpRow'; row.style.setProperty('--bc',c.color); row.innerHTML='<div class="ha"></div><div class="ht"><b>'+c.name+'</b> '+typePill(c.type)+'<span class="hs">'+c.skill+'</span><small>'+c.ability+'</small></div>'; faceStyle(row.querySelector('.ha'),c.key); helpList.appendChild(row); }); } helpScreen.hidden=false; });
   document.getElementById('helpClose').addEventListener('click',function(){ helpScreen.hidden=true; });
@@ -757,9 +757,9 @@
     else if(G.aphase==='telegraph'){ if(G.tPhase>=G.telDur){ setDodge(false); if(!G.dodged){ var dmg=en.st.atk+(G.charmActive?1:0); G.hearts-=dmg; G.shake=18; SFX.hurt(); G.floaters.push({ x:W/2,y:H*0.44,vy:-40,age:0,life:0.9,text:'いたっ！ -'+dmg+'♥',color:'#ff7a90',big:true }); if(G.hearts<=0){ aLose(); return; } } G.aphase='battle'; G.tPhase=0; G.nextAtk=en.st.gap*(0.7+Math.random()*0.4); } }
     else if(G.aphase==='clear'){ if(G.tPhase>=1.5){ if(G.stageIdx<STAGES.length-1){ G.stageIdx++; spawnEnemy(G.stageIdx); } else { aWin(); } } } }
   function tryCharm(){ var avail=G.party.filter(function(s){ return !s.charmed; }); if(avail.length<=1){ G.charmTimer=0; G.nextCharm=8; return; } var s=avail[Math.floor(Math.random()*avail.length)]; s.charmed=true; s.rescue=0; G.charmActive=true; G.charmTimer=0; G.nextCharm=5+Math.random()*2.5; var side=(s.hx<W/2)?-1:1; s.charmSlotX=G.enemy.x+side*W*0.24; s.charmSlotY=G.enemy.y+H*0.02; SFX.charm(); G.shake=14; G.floaters.push({ x:s.x,y:s.y-s.h/2,vy:-30,age:0,life:1.4,text:s.c.name+' が あやつられた！',color:'#c060ff',big:true }); }
-  function aWin(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').textContent='せかいを すくった！'; document.getElementById('winMsg').textContent=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML='こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span><br><span style="color:#ffd36b">ゲットした どうぐ</span><br>'+dropsSummary(); winScreen.hidden=false; SFX.boss();
+  function aWin(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').innerHTML='<ruby>世界<rt>せかい</rt></ruby>を すくった！'; document.getElementById('winMsg').innerHTML=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML='こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span><br><span style="color:#ffd36b">ゲットした どうぐ</span><br>'+dropsSummary(); winScreen.hidden=false; SFX.boss();
     SAVE.clears++; SAVE.actClears++; SAVE.bestStage=Math.max(SAVE.bestStage,STAGES.length); if(!SAVE.bestTime||t<SAVE.bestTime)SAVE.bestTime=t; record('action','クリア','ステージ'+STAGES.length+'・'+t+'秒'); }
-  function aLose(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var ls=document.getElementById('loseSub'); if(ls) ls.innerHTML='ここまでの しょうひん<br>'+dropsSummary(); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
+  function aLose(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var ls=document.getElementById('loseSub'); if(ls) ls.innerHTML='ここまでの <ruby>賞品<rt>しょうひん</rt></ruby><br>'+dropsSummary(); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
 
   // ========================================================= RPG MODE =========================================================
   // ===== 100-enemy quest (図鑑どおりの名前・系統) =====
@@ -830,10 +830,10 @@
       var T=TYPES[en.type]||{col:'#888',name:''}; var tag='<div class="etype" style="background:'+T.col+'">'+T.name+'</div>';
       return '<div class="ecell'+boss+done+'" data-i="'+idx+'">'+tag+thumb+'<div class="eno">No.'+no+'</div><div class="en2">'+(en.boss?'★ ':'')+en.name+'</div></div>'; }).join('');
     hubScreen.innerHTML='<div class="title-en" style="font-size:24px">ぼうけん</div>'+
-      '<div class="hubHint">たたかう あいてを えらんでね</div>'+
-      '<div class="hubProg">たおした '+beat+' ／ '+QMAX+(all?'　ぜんぶ クリア！':'')+'<div class="hubbar"><div style="width:'+(beat/QMAX*100)+'%"></div></div></div>'+
+      '<div class="hubHint"><ruby>戦<rt>たたか</rt></ruby>う あいてを <ruby>選<rt>えら</rt></ruby>んでね</div>'+
+      '<div class="hubProg">たおした '+beat+' ／ '+QMAX+(all?'　<ruby>全部<rt>ぜんぶ</rt></ruby> クリア！':'')+'<div class="hubbar"><div style="width:'+(beat/QMAX*100)+'%"></div></div></div>'+
       '<div class="egrid" id="egrid">'+cells+'</div>'+
-      '<button class="btn sub" id="hubReset" style="font-size:13px">きろくを さいしょから</button>';
+      '<button class="btn sub" id="hubReset" style="font-size:13px"><ruby>記録<rt>きろく</rt></ruby>を <ruby>最初<rt>さいしょ</rt></ruby>から</button>';
     var grid=document.getElementById('egrid');
     grid.addEventListener('click',function(e){ var c=e.target.closest('.ecell'); if(!c) return; var idx=+c.getAttribute('data-i'); startBattle(ENEMIES[idx]); });
     document.getElementById('hubReset').onclick=function(){ if(window.confirm('ぼうけんの きろくを さいしょから？（たおした きろくが きえます／レベルは そのまま）')){ CDATA.quest={progress:0,beaten:{}}; csave(); R.beaten={}; R.progress=0; showHub(); } };
@@ -854,7 +854,7 @@
   function showPick(edef){ R.sub='pick'; R.pendingBattle=edef; R.pickSel=R.party.slice(0,ACTIVE_CAP).map(function(m){return m.c.key;}); storyEl.hidden=true; rpgUI.hidden=true; hubScreen.hidden=true; pickScreen.hidden=false; pickBox.innerHTML='';
     R.party.forEach(function(m){ var cell=document.createElement('div'); cell.className='rosterCell'; cell.style.setProperty('--bc',m.c.color); cell.innerHTML='<div class="ravatar" style="--bc:'+m.c.color+'"></div><div class="rn">'+m.c.name+' Lv'+m.lv+'</div>'; faceStyle(cell.querySelector('.ravatar'),m.c.key); cell.addEventListener('click',function(){ togglePick(m.c.key); }); pickBox.appendChild(cell); cell._key=m.c.key; }); refreshPick(); }
   function togglePick(k){ var i=R.pickSel.indexOf(k); if(i>=0)R.pickSel.splice(i,1); else { if(R.pickSel.length>=ACTIVE_CAP)return; R.pickSel.push(k); } refreshPick(); }
-  function refreshPick(){ [].forEach.call(pickBox.children,function(cell){ var on=R.pickSel.indexOf(cell._key)>=0; cell.classList.toggle('sel',on); cell.classList.toggle('dim',!on&&R.pickSel.length>=ACTIVE_CAP); }); var n=R.pickSel.length; pickInfo.innerHTML=ACTIVE_CAP+'人 えらぼう！ <small>いま '+n+'人'+(n<ACTIVE_CAP?'（あと '+(ACTIVE_CAP-n)+'人）':'　じゅんび OK！')+'</small>'; document.getElementById('pickStart').disabled=(n!==ACTIVE_CAP); }
+  function refreshPick(){ [].forEach.call(pickBox.children,function(cell){ var on=R.pickSel.indexOf(cell._key)>=0; cell.classList.toggle('sel',on); cell.classList.toggle('dim',!on&&R.pickSel.length>=ACTIVE_CAP); }); var n=R.pickSel.length; pickInfo.innerHTML=ACTIVE_CAP+'<ruby>人<rt>にん</rt></ruby> <ruby>選<rt>えら</rt></ruby>ぼう！ <small>いま '+n+'<ruby>人<rt>にん</rt></ruby>'+(n<ACTIVE_CAP?'（あと '+(ACTIVE_CAP-n)+'<ruby>人<rt>にん</rt></ruby>）':'　じゅんび OK！')+'</small>'; document.getElementById('pickStart').disabled=(n!==ACTIVE_CAP); }
   document.getElementById('pickStart').addEventListener('click',function(){ if(R.pickSel.length!==ACTIVE_CAP) return; R.active=R.pickSel.map(function(k){ return R.party.filter(function(m){return m.c.key===k;})[0]; }); pickScreen.hidden=true; beginBattle(R.pendingBattle); });
 
   function beginBattle(edef){ MODE='rpg'; hubScreen.hidden=true; R.enemy={ def:edef, no:edef.no, name:edef.name, art:edef.art, sprite:edef.sprite, kei:edef.kei, col:edef.col, type:edef.type, black:!!edef.black, boss:!!edef.boss, mid:!!edef.mid, tier:edef.tier, hp:edef.hp, hpMax:edef.hp, atk:edef.atk, dfn:edef.def, spd:edef.spd, exp:edef.exp, skills:edef.skills, x:W/2, y:H*0.26, r:Math.min(W,H)*(edef.boss?0.15:0.12), bob:0, flash:0, flinch:0, dead:false, dieT:0, wing:0 };
@@ -868,10 +868,10 @@
     R.sub='input'; buildCmdMain(R.active[R.curAlly]);
   }
   function buildCmdMain(m){ rpgCmd.className=''; rpgCmd.innerHTML=''; setLog(m.c.name+' の ターン（HP '+m.hp+'/'+m.hpMax+'　MP '+m.mp+'/'+m.mpMax+'）');
-    addCmd('たたかう','',function(){ chooseAction(m,{kind:'attack'}); });
+    addCmd('<ruby>戦<rt>たたか</rt></ruby>う','',function(){ chooseAction(m,{kind:'attack'}); });
     addCmd('とくぎ','',function(){ buildCmdSkills(m); });
     var usable=ITEMORDER.filter(function(k){ return ITEMS[k].use && itemCount(k)>0; });
-    addCmd('どうぐ', usable.length?('もち '+usable.reduce(function(a,k){return a+itemCount(k);},0)):'なし', function(){ if(usable.length) buildCmdItems(m); else setLog('どうぐが ない。アクションバトルで あつめよう！'); });
+    addCmd('どうぐ', usable.length?('<ruby>持<rt>も</rt></ruby>ち '+usable.reduce(function(a,k){return a+itemCount(k);},0)):'なし', function(){ if(usable.length) buildCmdItems(m); else setLog('どうぐが ない。アクションバトルで あつめよう！'); });
     addCmd('ぼうぎょ','',function(){ chooseAction(m,{kind:'guard'}); });
   }
   function buildCmdSkills(m){ rpgCmd.className='skills'; rpgCmd.innerHTML='';
@@ -956,7 +956,7 @@
     showStory(head.concat(msgs), function(){ showHub(); }); }
   function rpgLoseBattle(){ R.sub='hub'; showHub(); }
   function rpgRetryBattle(){ showHub(); }
-  function rpgWinFinal(){ MODE='menu'; LASTMODE='rpg'; BGM.stop(); storyEl.hidden=true; rpgUI.hidden=true; hubScreen.hidden=true; document.getElementById('winTitle').textContent='ぜんぶ クリア！'; document.getElementById('winMsg').textContent='ラスボス BLACK を たおし、せかいに ひかりが もどった！'; document.getElementById('winStats').innerHTML=R.party.map(function(m){ return m.c.name+' Lv'+m.lv; }).join('　'); winScreen.hidden=false; SFX.boss(); }
+  function rpgWinFinal(){ MODE='menu'; LASTMODE='rpg'; BGM.stop(); storyEl.hidden=true; rpgUI.hidden=true; hubScreen.hidden=true; document.getElementById('winTitle').innerHTML='<ruby>全部<rt>ぜんぶ</rt></ruby> クリア！'; document.getElementById('winMsg').innerHTML='ラスボス BLACK を たおし、<ruby>世界<rt>せかい</rt></ruby>に ひかりが もどった！'; document.getElementById('winStats').innerHTML=R.party.map(function(m){ return m.c.name+' Lv'+m.lv; }).join('　'); winScreen.hidden=false; SFX.boss(); }
 
   // RPG input on canvas for enemy? none. Story handled by storyEl click.
   function rpgUpdate(dt){
