@@ -120,6 +120,21 @@
   .ecell.beaten .etype{ opacity:.55; }
   .ecell.beaten::after{ content:'討伐'; position:absolute; top:6px; left:4px; right:4px; aspect-ratio:1/1; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(10,4,8,.32); color:#ff3b30; font-family:var(--pop); font-weight:800; font-size:19px; letter-spacing:3px; text-shadow:0 2px 5px rgba(0,0,0,.95); }
   .hubHint{ font-family:var(--pop); font-size:13px; color:#ffd36b; }
+  #shopScreen{ justify-content:flex-start; gap:10px; background:radial-gradient(130% 90% at 50% 0%, #2a1e12, #1a1208 55%, #0c0819); }
+  .shopHead{ display:flex; align-items:center; gap:10px; width:100%; max-width:380px; margin-top:4px; }
+  .shopHead .ojii{ font-size:44px; flex:0 0 auto; }
+  .shopHead .bubble{ position:relative; background:#fff; color:#2a1746; border-radius:12px; padding:8px 12px; font-family:var(--pop); font-size:13px; flex:1; }
+  .shopHead .bubble:before{ content:''; position:absolute; left:-8px; top:16px; border:7px solid transparent; border-right-color:#fff; }
+  .coinBig{ font-family:var(--pop); font-size:18px; color:#ffd36b; }
+  .shopTabs{ display:flex; gap:8px; }
+  .stab{ font-family:var(--pop); font-size:14px; padding:6px 22px; border-radius:12px; border:1.5px solid rgba(255,255,255,.25); background:rgba(255,255,255,.06); color:#c9a6ff; cursor:pointer; }
+  .stab.on{ background:var(--gold); color:#2a1746; border-color:var(--gold); font-weight:800; }
+  .shopList{ width:100%; max-width:400px; display:flex; flex-direction:column; gap:6px; }
+  .shopRow{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:12px; padding:6px 10px; }
+  .shopRow .si{ font-size:26px; flex:0 0 auto; width:34px; text-align:center; }
+  .shopRow .sinfo{ flex:1; text-align:left; line-height:1.2; }
+  .shopRow .sinfo b{ font-family:var(--pop); font-size:13px; }
+  .shopRow .sinfo small{ display:block; font-size:10px; color:#c9a6ff; }
   #charStat{ background:rgba(8,5,18,.88); }
   .statCard{ width:100%; max-width:330px; background:linear-gradient(#1c1436,#140e2a); border:2px solid var(--gold); border-radius:18px; padding:14px 16px 18px; display:flex; flex-direction:column; align-items:center; gap:6px; box-shadow:0 10px 40px rgba(0,0,0,.55); }
   .statCard canvas{ width:170px; height:187px; border-radius:12px; }
@@ -151,9 +166,10 @@
       <div class="title-jp">7つの心が、世界をつなぐ</div></div>
     <div style="font-family:var(--pop);font-size:14px;color:#ffd36b">どっちで あそぶ？</div>
     <div class="modeCard action" id="modeAction"><div class="mi">⚔️</div>
-      <div class="mt"><b>アクションバトル</b><small>3人 えらんで、立ち絵をタップで こうげき！ 30体の てきを たおそう。すぐ あそべる。</small></div></div>
+      <div class="mt"><b>アクションバトル</b><small>3人で 10連戦！たおすと <b style="color:#ffd36b">賞品＋コイン</b> ゲット。むずかしいよ。（レベルは あがらない）</small></div></div>
     <div class="modeCard rpg" id="modeRpg"><div class="mi">📖</div>
       <div class="mt"><b>ぼうけん（100体クエスト）</b><small>1戦ずつ てきを たおして レベルアップ。ぜんぶで100体。10人から 出撃を えらび、つづきから あそべる。</small></div></div>
+    <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを かう／賞品を うる</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
     <div id="charLv" style="width:100%;max-width:380px"></div>
     <div id="savePanel" style="width:100%;max-width:340px;font-size:12px;color:#c9a6ff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 14px;text-align:left;line-height:1.7"></div>
     <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">きろくは じどうで ほぞんされます。とじても だいじょうぶ。</div>
@@ -219,10 +235,11 @@
   </div>
   <div id="charStat" class="screen" hidden></div>
   <div id="codeModal" class="screen" hidden></div>
+  <div id="shopScreen" class="screen" hidden></div>
 
   <div id="loseScreen" class="screen" hidden>
     <div class="result-title">やられた…</div>
-    <div class="result-sub">でも あきらめない！<br>もういちど ちょうせんだ！</div>
+    <div class="result-sub" id="loseSub">でも あきらめない！<br>もういちど ちょうせんだ！</div>
     <button class="btn" id="loseRetry">リベンジ する</button>
     <button class="btn sub" id="loseTop">トップへ もどる</button>
   </div>
@@ -330,7 +347,40 @@
 
   // ===== shared character progression（共通レベル：アクション/RPG 両モードで共有・永続） =====
   var CSKEY='sd_chars_v1';
-  var CDATA=(function(){ try{ var d=JSON.parse(localStorage.getItem(CSKEY))||{}; d.chars=d.chars||{}; d.quest=d.quest||{progress:0}; return d; }catch(e){ return {chars:{},quest:{progress:0}}; } })();
+  var CDATA=(function(){ try{ var d=JSON.parse(localStorage.getItem(CSKEY))||{}; d.chars=d.chars||{}; d.quest=d.quest||{progress:0}; d.items=d.items||{}; return d; }catch(e){ return {chars:{},quest:{progress:0},items:{}}; } })();
+  if(!CDATA.items)CDATA.items={}; if(typeof CDATA.coins!=='number')CDATA.coins=0;
+  // ===== 賞品＆アイテム（アクションで ゲット → ショップで 売買／ぼうけんで つかう）=====
+  // use: ぼうけんで つかえる（healOne/healFull/healAll/mp/revive）。buy>0: ショップで かえる。sell: うると もらえるコイン。
+  var ITEMS={
+    yakusou:{name:'やくそう',emoji:'🌿',rar:'C',desc:'1人の HPを 90 かいふく',use:'healOne',val:90,sell:6,buy:18},
+    mpwater:{name:'まほうのしずく',emoji:'💧',rar:'C',desc:'1人の MPを 60 かいふく',use:'mp',val:60,sell:12,buy:36},
+    allcure:{name:'みんなのくすり',emoji:'🧪',rar:'U',desc:'みんなの HPを 120 かいふく',use:'healAll',val:120,sell:24,buy:70},
+    bigcure:{name:'スーパーやくそう',emoji:'💚',rar:'U',desc:'1人の HPを ぜんかい',use:'healFull',sell:30,buy:90},
+    hane:{name:'ふっかつのはね',emoji:'🪽',rar:'R',desc:'たおれた 1人を ふっかつ',use:'revive',sell:70,buy:200},
+    genki:{name:'げんきドリンク',emoji:'🥤',rar:'U',desc:'1人の HP・MP かいふく',use:'healmp',sell:26,buy:80},
+    // うる ための おたから（レアほど 高い）
+    kakera:{name:'どうのかけら',emoji:'🔩',rar:'C',desc:'うると コインに なる',sell:5},
+    glass:{name:'ガラスだま',emoji:'🔵',rar:'C',desc:'うると コインに なる',sell:8},
+    shell:{name:'きれいな貝がら',emoji:'🐚',rar:'C',desc:'うると コインに なる',sell:12},
+    feather:{name:'とりのはね',emoji:'🪶',rar:'C',desc:'うると コインに なる',sell:10},
+    silver:{name:'ぎんのメダル',emoji:'🥈',rar:'U',desc:'うると コインに なる',sell:28},
+    crystal:{name:'クリスタル',emoji:'🔷',rar:'U',desc:'うると コインに なる',sell:45},
+    egg:{name:'ふしぎなたまご',emoji:'🥚',rar:'U',desc:'うると コインに なる',sell:55},
+    gold:{name:'きんのメダル',emoji:'🏅',rar:'R',desc:'うると たかく うれる',sell:90},
+    ruby:{name:'ルビー',emoji:'❤️',rar:'R',desc:'うると たかく うれる',sell:130},
+    sapphire:{name:'サファイア',emoji:'💙',rar:'R',desc:'うると たかく うれる',sell:130},
+    emerald:{name:'エメラルド',emoji:'💚',rar:'R',desc:'うると たかく うれる',sell:145},
+    scale:{name:'ドラゴンのウロコ',emoji:'🐉',rar:'E',desc:'とても たかく うれる',sell:230},
+    lamp:{name:'まほうのランプ',emoji:'🪔',rar:'E',desc:'とても たかく うれる',sell:280},
+    star:{name:'せいなるたま',emoji:'⭐',rar:'L',desc:'すごく たかく うれる',sell:420},
+    crown:{name:'でんせつのおうかん',emoji:'👑',rar:'L',desc:'さいこうに たかく うれる',sell:600}
+  };
+  var ITEMORDER=['yakusou','mpwater','allcure','bigcure','genki','hane','kakera','glass','shell','feather','silver','crystal','egg','gold','ruby','sapphire','emerald','scale','lamp','star','crown'];
+  var RARNAME={C:'ふつう',U:'レア',R:'すごくレア',E:'超レア',L:'でんせつ'};
+  var RARCOL={C:'#b8c0d0',U:'#5be07a',R:'#5aa0ff',E:'#c060ff',L:'#ffd24a'};
+  function itemCount(k){ return (CDATA.items&&CDATA.items[k])||0; }
+  function addItem(k,n){ CDATA.items[k]=(CDATA.items[k]||0)+(n||1); }
+  function addCoins(n){ CDATA.coins=Math.max(0,(CDATA.coins||0)+n); }
   var EQMAX=5; // つかえる（セットできる）わざは 5つまで
   function cget(k){ if(!CDATA.chars[k]) CDATA.chars[k]={lv:1,exp:0,learned:[],equipped:[]}; var st=CDATA.chars[k]; if(!st.learned)st.learned=[]; if(!st.equipped)st.equipped=[]; return st; }
   function csave(){ try{ localStorage.setItem(CSKEY, JSON.stringify(CDATA)); }catch(e){} }
@@ -341,16 +391,14 @@
   function grantExp(k,amt){ var st=cget(k), c=byKey(k), msgs=[], over=false; st.exp+=amt; while(st.exp>=nextExp(st.lv)&&st.lv<100){ st.exp-=nextExp(st.lv); st.lv++; msgs.push(c.name+' Lv'+st.lv+'！'); c.learn.forEach(function(p){ if(st.lv>=p[0]&&st.learned.indexOf(p[1])<0){ st.learned.push(p[1]); msgs.push(c.name+'は 「'+SKILLS[p[1]].name+'」を おぼえた！'); if(st.equipped.length>=EQMAX) over=true; } }); } if(st.lv>=100)st.exp=0; ensureLearn(k); if(over) msgs.push('（つかえる わざは 5つまで。TOPで いれかえ できるよ）'); return msgs; }
 
   // ===== ACTION MODE stages =====
-  var STAGES=(function(){
+  var STAGES=(function(){ // アクションは 10連戦・高難度（ぼうけんとは べつの まもの）
     var arr=[], arts=['slime','ghost','golem','dragon'];
-    var cols=['#5bd66a','#b49ce8','#7a8290','#c03a4a','#ffa64a','#4ab0ff','#8bd44a','#ff7ab8','#4be0c0','#d0c8e0'];
-    var nm=['スライム','ゴースト','こうもり','スケルトン','オーク','ウィスプ','リザード','ガーゴイル','ダークウルフ',null,
-            'マンドラ','インプ','きめんへい','アイスドラゴン','ワイバーン','ナイトメア','デーモン','ゴーレムロード','シャドウ',null,
-            'バジリスク','ヘルハウンド','リッチ','カオスビースト','ダークエルフ','ヴァンパイア','グリフォン','ベヒーモス','しんえいへい',null];
-    for(var i=1;i<=30;i++){ var idx=i-1;
-      if(i===30){ arr.push({ name:'まおう BLACK', art:'black', hp:1600, atk:2, gap:1.9, tel:0.82, boss:true, col:'#c0104a' }); continue; }
-      if(i%10===0){ var mn=(i===10)?'ツインゴーレム':'あんこくきし'; arr.push({ name:mn, art:(i===10?'golem':'dragon'), hp:Math.round((80+i*20)*2.4), atk:2, gap:Math.max(1.5,2.6-i*0.03), tel:Math.max(0.85,1.3-i*0.02), mid:true, col:(i===10?'#8a93a6':'#7c3fd6') }); continue; }
-      arr.push({ name:nm[idx]||('まもの'+i), art:arts[idx%4], hp:Math.round(80+i*20+i*i*0.6), atk:(i<8?1:2), gap:Math.max(1.5,3.4-i*0.06), tel:Math.max(0.8,1.55-i*0.026), col:cols[idx%cols.length] });
+    var cols=['#5bd66a','#b49ce8','#7a8290','#ffa64a','#8a93a6','#4ab0ff','#c03a4a','#ff7ab8','#b060ff'];
+    var nm=['スライム','ゴースト','こうもり','オーク','','リザード','ナイトメア','デーモン','シャドウ'];
+    for(var i=1;i<=10;i++){ var idx=i-1;
+      if(i===10){ arr.push({ name:'まおう BLACK', art:'black', hp:2600, atk:2, gap:1.45, tel:0.6, boss:true, col:'#c0104a' }); continue; }
+      if(i===5){ arr.push({ name:'ツインゴーレム', art:'golem', hp:Math.round(240+i*95), atk:2, gap:1.5, tel:0.68, mid:true, col:'#8a93a6' }); continue; }
+      arr.push({ name:nm[idx]||('まもの'+i), art:arts[idx%4], hp:Math.round(95+i*58+i*i*4), atk:(i<3?1:2), gap:Math.max(1.35,2.5-i*0.13), tel:Math.max(0.64,1.2-i*0.07), col:cols[idx%cols.length] });
     }
     return arr;
   })();
@@ -410,7 +458,7 @@
   function persist(){ try{ localStorage.setItem(SKEY, JSON.stringify(SAVE)); }catch(e){} }
   function nowStr(){ try{ var d=new Date(); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }catch(e){ return ''; } }
   function record(mode,result,detail){ SAVE.hist.unshift({ d:nowStr(), m:mode, r:result, x:detail||'' }); if(SAVE.hist.length>15) SAVE.hist.length=15; persist(); renderSave(); }
-  function renderSave(){ renderCharLv(); var el=document.getElementById('savePanel'); if(!el) return;
+  function renderSave(){ renderCharLv(); renderCoins(); var el=document.getElementById('savePanel'); if(!el) return;
     if(!SAVE.plays){ el.innerHTML='<b style="color:#ffd36b">これまでの きろく</b><br>まだ きろくは ありません。あそぶと たまっていくよ。'; return; }
     var act = SAVE.bestStage? ('アクション最高 ステージ'+SAVE.bestStage+(SAVE.bestTime?'・最短'+SAVE.bestTime+'秒':'')) : '';
     var rpg = SAVE.bestRpgLv? ('RPG最高 Lv'+SAVE.bestRpgLv) : '';
@@ -479,6 +527,31 @@
   }
   document.getElementById('resetLvBtn').addEventListener('click',function(){ showResetModal('lv'); });
   document.getElementById('resetBeatenBtn').addEventListener('click',function(){ showResetModal('beaten'); });
+  // ---- ショップ（おじいさん）----
+  function renderCoins(){ var c=document.getElementById('coinTop'); if(c) c.textContent='🪙 '+(CDATA.coins||0); }
+  var shopTab='buy';
+  function showShop(){ MODE='menu'; hideAll(); var el=document.getElementById('shopScreen'); el.hidden=false; topBtn.hidden=false; drawShop(); }
+  function drawShop(){ var el=document.getElementById('shopScreen'); var coins=CDATA.coins||0;
+    var talk = shopTab==='buy' ? 'いらっしゃい。ほしい どうぐは あるかな？' : 'ほう、いい 賞品を もっとるな。かいとろう。';
+    var listHtml='';
+    if(shopTab==='buy'){ listHtml=ITEMORDER.filter(function(k){return ITEMS[k].buy;}).map(function(k){ var it=ITEMS[k],can=coins>=it.buy; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b><small>'+it.desc+'（もちもの '+itemCount(k)+'）</small></div><button class="btn '+(can?'':'sub')+' shopBuy" data-k="'+k+'" '+(can?'':'disabled')+' style="font-size:13px;padding:6px 12px">🪙'+it.buy+'</button></div>'; }).join('');
+    } else { var owned=ITEMORDER.filter(function(k){return itemCount(k)>0;});
+      listHtml = owned.length ? owned.map(function(k){ var it=ITEMS[k]; return '<div class="shopRow"><div class="si">'+it.emoji+'</div><div class="sinfo"><b>'+it.name+'</b> <span style="color:'+RARCOL[it.rar]+';font-size:10px">'+RARNAME[it.rar]+'</span> ×'+itemCount(k)+'<small>'+it.desc+'</small></div><button class="btn shopSell" data-k="'+k+'" style="font-size:13px;padding:6px 12px">うる 🪙'+it.sell+'</button></div>'; }).join('') : '<div style="color:#c9a6ff;font-size:13px;padding:16px">うれる 賞品が ない。<br>アクションバトルで あつめよう！</div>';
+    }
+    el.innerHTML='<div class="title-en" style="font-size:22px">ショップ</div>'
+      +'<div class="shopHead"><div class="ojii">👴</div><div class="bubble">'+talk+'</div></div>'
+      +'<div class="coinBig">🪙 '+coins+' コイン</div>'
+      +'<div class="shopTabs"><button class="stab '+(shopTab==='buy'?'on':'')+'" id="tabBuy">かう</button><button class="stab '+(shopTab==='sell'?'on':'')+'" id="tabSell">うる</button></div>'
+      +'<div class="shopList">'+listHtml+'</div>'
+      +'<div id="shopMsg" style="font-size:12px;color:#7fe0a0;min-height:16px"></div>'
+      +'<button class="btn sub" id="shopClose" style="font-size:15px">とじる</button>';
+    document.getElementById('tabBuy').onclick=function(){ shopTab='buy'; drawShop(); };
+    document.getElementById('tabSell').onclick=function(){ shopTab='sell'; drawShop(); };
+    document.getElementById('shopClose').onclick=function(){ el.hidden=true; toTop(); };
+    [].forEach.call(el.querySelectorAll('.shopBuy'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'), it=ITEMS[k]; if((CDATA.coins||0)>=it.buy){ addCoins(-it.buy); addItem(k,1); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#7fe0a0'; m.textContent=it.emoji+it.name+' を かった！'; } SFX.rescue(); } }; });
+    [].forEach.call(el.querySelectorAll('.shopSell'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-k'); if(itemCount(k)>0){ CDATA.items[k]--; addCoins(ITEMS[k].sell); csave(); drawShop(); var m=document.getElementById('shopMsg'); if(m){ m.style.color='#ffd36b'; m.textContent=ITEMS[k].name+' を うった！ +🪙'+ITEMS[k].sell; } SFX.rescue(); } }; });
+  }
+  document.getElementById('shopEntry').addEventListener('click',showShop);
   // オーディオ解除（スマホは 最初の タップで AudioContext を resume しないと 音が でない）
   (function(){ function unlock(){ var a=actx(); if(!a) return; if(a.state==='suspended'){ try{ a.resume(); }catch(e){} } try{ var b=a.createBufferSource(); b.buffer=a.createBuffer(1,1,22050); b.connect(a.destination); b.start(0); }catch(e){} }
     ['pointerdown','touchend','mousedown','keydown','click'].forEach(function(ev){ document.addEventListener(ev, unlock, {passive:true}); }); })();
@@ -510,7 +583,7 @@
       cc.restore(); }
     document.getElementById('statClose').onclick=function(){ el.hidden=true; };
   }
-  function hideAll(){ document.getElementById('charStat').hidden=true; [modeScreen,titleScreen,helpScreen,winScreen,loseScreen,document.getElementById('rpgPick'),document.getElementById('rpgStory'),document.getElementById('rpgUI'),document.getElementById('questHub')].forEach(function(e){ e.hidden=true; }); setDodge(false); }
+  function hideAll(){ document.getElementById('charStat').hidden=true; document.getElementById('shopScreen').hidden=true; [modeScreen,titleScreen,helpScreen,winScreen,loseScreen,document.getElementById('rpgPick'),document.getElementById('rpgStory'),document.getElementById('rpgUI'),document.getElementById('questHub')].forEach(function(e){ e.hidden=true; }); setDodge(false); }
   function toTop(){ MODE='menu'; hideAll(); modeScreen.hidden=false; topBtn.hidden=true; renderSave(); BGM.stop(); }
   topBtn.addEventListener('click',toTop);
   (function(){ var mb=document.getElementById('muteBtn'); try{ muted=(localStorage.getItem('sd_muted')==='1'); }catch(e){} mb.textContent=muted?'🔇':'🔊'; mb.addEventListener('click',function(){ muted=!muted; mb.textContent=muted?'🔇':'🔊'; try{ localStorage.setItem('sd_muted',muted?'1':'0'); }catch(e){} if(!muted){ var a=actx(); if(a&&a.state==='suspended'){try{a.resume();}catch(e){}} } }); })();
@@ -533,7 +606,8 @@
   // ========================================================= ACTION MODE =========================================================
   function startGame(){ LASTMODE='action'; MODE='action'; hideAll(); topBtn.hidden=false; SAVE.plays++; persist();
     G.party=selected.map(function(k){ var st=cget(k); ensureLearn(k); return { c:byKey(k), lv:st.lv, cd:0, gauge:0, charmed:false, rescue:0, atkAnim:0, x:0,y:0,hx:0,hy:0,w:0,h:0 }; });
-    layoutParty(true); G.hearts=G.maxHearts; G.stageIdx=0; G.effects.length=0; G.particles.length=0; G.floaters.length=0; G.shake=0; G.hitFlash=0; G.buffT=0; G.totalHits=0; G.started=G.time; G.charmActive=false; spawnEnemy(0); BGM.play('normal'); }
+    layoutParty(true); G.hearts=G.maxHearts; G.stageIdx=0; G.effects.length=0; G.particles.length=0; G.floaters.length=0; G.shake=0; G.hitFlash=0; G.buffT=0; G.totalHits=0; G.started=G.time; G.charmActive=false; G.drops={}; G.coinRun=0; spawnEnemy(0); BGM.play('normal'); }
+  function dropsSummary(){ var d=G.drops||{}; var parts=ITEMORDER.filter(function(k){return d[k];}).map(function(k){ return (ITEMS[k].emoji||'')+ITEMS[k].name+' ×'+d[k]; }); return (parts.length?parts.join('　'):'なし')+'<br>🪙 '+(G.coinRun||0)+' コイン かくとく'; }
   function layoutParty(snap){ if(!G.party||!G.party.length) return; var n=G.party.length, cw=Math.min(W*0.29,120), ch=cw*1.28, gap=(W-n*cw)/(n+1), by=H-ch-46; G.party.forEach(function(s,i){ s.w=cw; s.h=ch; s.hx=gap+i*(cw+gap)+cw/2; s.hy=by+ch/2; if(snap){ s.x=s.hx; s.y=s.hy; } }); }
   function setDodge(on){ dodgeBtn.classList.toggle('show',on); }
   function spawnEnemy(idx){ var st=STAGES[idx]; G.enemy={ st:st, hp:st.hp, maxHp:st.hp, x:W/2, y:H*0.24, r:Math.min(W,H)*(st.boss?0.16:st.mid?0.15:0.12), bob:0, flash:0, flinch:0, dead:false, dieT:0, wing:0 };
@@ -553,9 +627,19 @@
   function spawnBurst(x,y,color){ for(var i=0;i<9;i++){ var a=Math.random()*Math.PI*2, sp=130*(0.4+Math.random()); G.particles.push({ x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-40,age:0,life:0.4+Math.random()*0.3,r:2+Math.random()*3,color:Math.random()<0.5?color:'#fff' }); } }
   function gainExpA(s,amt){ s.exp+=amt; while(s.exp>=s.next&&s.lv<12){ s.exp-=s.next; s.lv++; s.next=Math.round(s.next*1.35); levelUpA(s); } }
   function levelUpA(s){ SFX.lvup(); s.atkAnim=0.3; var msg='Lv'+s.lv+'！'; if(s.lv===3)msg='Lv3 2れんげき！'; if(s.lv===5)msg='Lv5 パワーアップ！'; if(s.lv===8)msg='Lv8 たつじん！'; G.floaters.push({ x:s.x,y:s.y-s.h/2-10,vy:-40,age:0,life:1.1,text:msg,color:'#ffd36b',big:true }); for(var i=0;i<14;i++){ var a=Math.random()*Math.PI*2; G.particles.push({ x:s.x,y:s.y,vx:Math.cos(a)*120,vy:Math.sin(a)*120-30,age:0,life:0.6,r:3,color:'#ffe6a0' }); } }
+  var POOL={ C:['yakusou','mpwater','kakera','glass','shell','feather'], U:['allcure','bigcure','genki','silver','crystal','egg'], R:['hane','gold','ruby','sapphire','emerald'], E:['scale','lamp'], L:['star','crown'] };
+  function rollDrop(en){ var r=Math.random(), tier;
+    if(en.st.boss){ tier = r<0.14?'L':(r<0.55?'E':'R'); }
+    else if(en.st.mid){ tier = r<0.10?'E':(r<0.50?'R':'U'); }
+    else { tier = r<0.05?'R':(r<0.35?'U':'C'); }
+    var p=POOL[tier]; return p[Math.floor(Math.random()*p.length)]; }
   function enemyDown(){ var en=G.enemy; en.dead=true; en.dieT=0; setDodge(false); G.shake=16; SFX.kill(); for(var i=0;i<30;i++){ spawnBurst(en.x+(Math.random()-0.5)*en.r*1.5,en.y+(Math.random()-0.5)*en.r*1.5,'#fff'); }
-    var rew=Math.round((20+(G.stageIdx+1)*13)*(en.st.boss?3:en.st.mid?2:1)); // shared EXP to active fighters
-    G.party.forEach(function(s){ var msgs=grantExp(s.c.key,rew); s.lv=cget(s.c.key).lv; if(msgs.length) levelUpA(s); }); csave();
+    // アクションバトルは レベルは あがらない。かわりに 賞品＋コインを ゲット！
+    var drop=rollDrop(en); var n=en.st.boss?2:1; addItem(drop,n);
+    var coin=Math.round((6+(G.stageIdx+1)*5)*(en.st.boss?4:en.st.mid?2:1)); addCoins(coin); csave();
+    G.drops=G.drops||{}; G.drops[drop]=(G.drops[drop]||0)+n; G.coinRun=(G.coinRun||0)+coin;
+    SFX.rescue(); G.floaters.push({ x:en.x,y:en.y-10,vy:-48,age:0,life:1.4,text:(ITEMS[drop].emoji||'')+ITEMS[drop].name+(n>1?' ×'+n:'')+' を ゲット！',color:RARCOL[ITEMS[drop].rar]||'#ffe36b',big:true });
+    G.floaters.push({ x:en.x,y:en.y+18,vy:-34,age:0,life:1.2,text:'🪙 '+coin+' コイン',color:'#ffd36b' });
     G.aphase='clear'; G.tPhase=0; }
   function doDodge(e){ e&&e.preventDefault&&e.preventDefault(); if(MODE!=='action') return; if(G.aphase==='telegraph'&&!G.dodged){ G.dodged=true; SFX.dodge(); setDodge(false); G.hitFlash=0.05; G.floaters.push({ x:W/2,y:H*0.44,vy:-42,age:0,life:0.9,text:'よけた！',color:'#7dff9a',big:true }); for(var i=0;i<20;i++){ var a=(i/20)*Math.PI*2; G.particles.push({ x:W/2,y:H*0.5,vx:Math.cos(a)*160,vy:Math.sin(a)*160,age:0,life:0.45,r:4,color:'#bfffcf' }); } G.aphase='battle'; G.tPhase=0; if(G.enemy) G.nextAtk=G.enemy.st.gap*(0.7+Math.random()*0.4); } }
   dodgeBtn.addEventListener('touchstart',doDodge,{passive:false}); dodgeBtn.addEventListener('mousedown',doDodge);
@@ -568,9 +652,9 @@
     else if(G.aphase==='telegraph'){ if(G.tPhase>=G.telDur){ setDodge(false); if(!G.dodged){ var dmg=en.st.atk+(G.charmActive?1:0); G.hearts-=dmg; G.shake=18; SFX.hurt(); G.floaters.push({ x:W/2,y:H*0.44,vy:-40,age:0,life:0.9,text:'いたっ！ -'+dmg+'♥',color:'#ff7a90',big:true }); if(G.hearts<=0){ aLose(); return; } } G.aphase='battle'; G.tPhase=0; G.nextAtk=en.st.gap*(0.7+Math.random()*0.4); } }
     else if(G.aphase==='clear'){ if(G.tPhase>=1.5){ if(G.stageIdx<STAGES.length-1){ G.stageIdx++; spawnEnemy(G.stageIdx); } else { aWin(); } } } }
   function tryCharm(){ var avail=G.party.filter(function(s){ return !s.charmed; }); if(avail.length<=1){ G.charmTimer=0; G.nextCharm=8; return; } var s=avail[Math.floor(Math.random()*avail.length)]; s.charmed=true; s.rescue=0; G.charmActive=true; G.charmTimer=0; G.nextCharm=5+Math.random()*2.5; var side=(s.hx<W/2)?-1:1; s.charmSlotX=G.enemy.x+side*W*0.24; s.charmSlotY=G.enemy.y+H*0.02; SFX.charm(); G.shake=14; G.floaters.push({ x:s.x,y:s.y-s.h/2,vy:-30,age:0,life:1.4,text:s.c.name+' が あやつられた！',color:'#c060ff',big:true }); }
-  function aWin(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').textContent='せかいを すくった！'; document.getElementById('winMsg').textContent=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML=G.party.map(function(s){ return s.c.name+' Lv'+s.lv; }).join('　')+'<br>こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span>'; winScreen.hidden=false; SFX.boss();
+  function aWin(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').textContent='せかいを すくった！'; document.getElementById('winMsg').textContent=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML='こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span><br><span style="color:#ffd36b">ゲットした どうぐ</span><br>'+dropsSummary(); winScreen.hidden=false; SFX.boss();
     SAVE.clears++; SAVE.actClears++; SAVE.bestStage=Math.max(SAVE.bestStage,STAGES.length); if(!SAVE.bestTime||t<SAVE.bestTime)SAVE.bestTime=t; record('action','クリア','ステージ'+STAGES.length+'・'+t+'秒'); }
-  function aLose(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
+  function aLose(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var ls=document.getElementById('loseSub'); if(ls) ls.innerHTML='ここまでの しょうひん<br>'+dropsSummary(); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
 
   // ========================================================= RPG MODE =========================================================
   // ===== 100-enemy quest (図鑑どおりの名前・系統) =====
@@ -681,10 +765,16 @@
   function buildCmdMain(m){ rpgCmd.className=''; rpgCmd.innerHTML=''; setLog(m.c.name+' の ターン（HP '+m.hp+'/'+m.hpMax+'　MP '+m.mp+'/'+m.mpMax+'）');
     addCmd('たたかう','',function(){ chooseAction(m,{kind:'attack'}); });
     addCmd('とくぎ','',function(){ buildCmdSkills(m); });
+    var usable=ITEMORDER.filter(function(k){ return ITEMS[k].use && itemCount(k)>0; });
+    addCmd('どうぐ', usable.length?('もち '+usable.reduce(function(a,k){return a+itemCount(k);},0)):'なし', function(){ if(usable.length) buildCmdItems(m); else setLog('どうぐが ない。アクションバトルで あつめよう！'); });
     addCmd('ぼうぎょ','',function(){ chooseAction(m,{kind:'guard'}); });
   }
   function buildCmdSkills(m){ rpgCmd.className='skills'; rpgCmd.innerHTML='';
     (m.equipped&&m.equipped.length?m.equipped:m.learned).forEach(function(key){ var sk=SKILLS[key]; var b=addCmd(sk.name,'MP'+sk.mp,function(){ if(m.mp<sk.mp){ setLog('MPが たりない！'); return; } chooseAction(m,{kind:'skill',key:key}); }); if(m.mp<sk.mp) b.disabled=true; });
+    var back=addCmd('◀ もどる','',function(){ buildCmdMain(m); }); back.className='cmdBtn back';
+  }
+  function buildCmdItems(m){ rpgCmd.className='skills'; rpgCmd.innerHTML='';
+    ITEMORDER.filter(function(k){ return ITEMS[k].use && itemCount(k)>0; }).forEach(function(k){ var it=ITEMS[k]; addCmd(it.emoji+it.name,'×'+itemCount(k),function(){ chooseAction(m,{kind:'item',item:k}); }); });
     var back=addCmd('◀ もどる','',function(){ buildCmdMain(m); }); back.className='cmdBtn back';
   }
   function addCmd(label,sub,fn){ var b=document.createElement('button'); b.className='cmdBtn'; b.innerHTML=label+(sub?'<small>'+sub+'</small>':''); b.addEventListener('click',fn); rpgCmd.appendChild(b); return b; }
@@ -708,6 +798,15 @@
     checkEnd(); }
   function allyAct(a){ var m=a.actor, en=R.enemy; m.hitFx=0.25;
     if(a.kind==='guard'){ m.guard=true; setLog(m.c.name+' は みを まもっている！'); return; }
+    if(a.kind==='item'){ var it=ITEMS[a.item]; var used=true;
+      if(it.use==='healOne'){ var t=lowestAlly(); t.hp=Math.min(t.hpMax,t.hp+it.val); rpgFx('light',m.c.color,t.x,t.y); floatR(t.x,t.y-30,'+'+it.val,'#7dff9a'); setLog(m.c.name+' は '+it.emoji+it.name+'！　'+t.c.name+' HP かいふく！'); }
+      else if(it.use==='healFull'){ var t2=lowestAlly(); t2.hp=t2.hpMax; rpgFx('light',m.c.color,t2.x,t2.y); floatR(t2.x,t2.y-30,'ぜんかい!','#7dff9a'); setLog(m.c.name+' は '+it.emoji+it.name+'！　'+t2.c.name+' HP ぜんかい！'); }
+      else if(it.use==='healAll'){ R.active.forEach(function(t){ if(t.hp>0){ t.hp=Math.min(t.hpMax,t.hp+it.val); floatR(t.x,t.y-30,'+'+it.val,'#7dff9a'); } }); rpgFx('cheer',m.c.color,W/2,H*0.55); setLog(m.c.name+' は '+it.emoji+it.name+'！　みんな かいふく！'); }
+      else if(it.use==='mp'){ m.mp=Math.min(m.mpMax,m.mp+it.val); floatR(m.x,m.y-30,'MP+'+it.val,'#7fd3ff'); setLog(m.c.name+' は '+it.emoji+it.name+'！　MP かいふく！'); }
+      else if(it.use==='healmp'){ var t3=lowestAlly(); t3.hp=Math.min(t3.hpMax,t3.hp+120); m.mp=Math.min(m.mpMax,m.mp+40); floatR(t3.x,t3.y-30,'げんき!','#7dff9a'); rpgFx('light',m.c.color,t3.x,t3.y); setLog(m.c.name+' は '+it.emoji+it.name+'！　HP・MP かいふく！'); }
+      else if(it.use==='revive'){ var dead=R.active.filter(function(t){return t.hp<=0;}); if(dead.length){ var d=dead[0]; d.hp=Math.round(d.hpMax*0.5); d.hitFx=0.2; rpgFx('light',m.c.color,d.x,d.y); floatR(d.x,d.y-30,'いきかえった!','#ffe36b'); SFX.lvup(); setLog(m.c.name+' は '+it.emoji+it.name+'！　'+d.c.name+' ふっかつ！'); } else { used=false; setLog('たおれた なかまが いないので '+it.name+' は つかわなかった'); } }
+      if(used && itemCount(a.item)>0){ CDATA.items[a.item]--; csave(); }
+      return; }
     var sk = a.kind==='attack' ? { name:'こうげき', pow:100, mp:0, type:'atk', fx:m.c.fx } : SKILLS[a.key];
     if(a.kind==='skill') m.mp=Math.max(0,m.mp-sk.mp);
     var atkVal=m.atk*(R.buffAtk>0?1.4:1), tm=typeMult(m.c.type, en.type);
