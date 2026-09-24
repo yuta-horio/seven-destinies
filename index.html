@@ -159,6 +159,11 @@
       <button class="btn sub" id="loadCodeBtn" style="font-size:13px;padding:8px 14px;flex:1">コードで つづき</button>
     </div>
     <div style="width:100%;max-width:340px;font-size:10px;color:#8a80a5;text-align:center;line-height:1.5">スマホで あそぶときは ときどき「きろくを ほぞん」で コードを コピー／スクショしておくと あんしん。</div>
+    <div style="width:100%;max-width:340px;display:flex;gap:8px;justify-content:center;margin-top:2px">
+      <button class="btn sub" id="resetLvBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">レベルを1に もどす</button>
+      <button class="btn sub" id="resetBeatenBtn" style="font-size:11px;padding:7px 8px;flex:1;opacity:.85">討伐きろくを けす</button>
+    </div>
+    <div style="width:100%;max-width:340px;font-size:9px;color:#7a7090;text-align:center">※パスワードが ひつよう（おうちのひとに きいてね）</div>
   </div>
 
   <!-- ACTION: character select -->
@@ -453,6 +458,27 @@
   }
   document.getElementById('saveCodeBtn').addEventListener('click',function(){ showCodeModal('save'); });
   document.getElementById('loadCodeBtn').addEventListener('click',function(){ showCodeModal('load'); });
+  function showResetModal(kind){ var el=document.getElementById('codeModal');
+    var title=kind==='lv'?'レベルを ぜんぶ 1に もどす':'討伐きろくを けす';
+    var warn=kind==='lv'?'ぜんいんの レベルが 1に もどります（もとに もどせません）。':'たおした きろくが ぜんぶ きえます（レベルは そのまま）。';
+    el.innerHTML='<div class="statCard"><div class="statName" style="color:#ff9ec2">'+title+'</div>'
+      +'<div style="font-size:12px;color:#c9a6ff;line-height:1.7;max-width:300px">'+warn+'<br>パスワードを いれてね。</div>'
+      +'<input id="pwIn" type="tel" inputmode="numeric" placeholder="パスワード" style="width:170px;font-size:22px;text-align:center;padding:8px;border-radius:10px;border:1px solid #7a6bd6;background:#120c22;color:#fff;letter-spacing:6px">'
+      +'<div id="pwMsg" style="font-size:12px;color:#ff9ec2;min-height:14px"></div>'
+      +'<button class="btn" id="pwDo" style="font-size:15px;padding:9px 24px">じっこう</button>'
+      +'<button class="btn sub" id="pwClose" style="font-size:14px">やめる</button></div>';
+    el.hidden=false; var inp=document.getElementById('pwIn'); try{ inp.focus(); }catch(e){}
+    document.getElementById('pwDo').onclick=function(){ var v=(inp.value||'').trim(); if(v!=='1001'){ document.getElementById('pwMsg').textContent='パスワードが ちがうよ'; inp.value=''; return; }
+      if(kind==='lv'){ CHARS.forEach(function(c){ CDATA.chars[c.key]={lv:1,exp:0,learned:[],equipped:[]}; ensureLearn(c.key); }); csave(); }
+      else { CDATA.quest={progress:0,beaten:{}}; csave(); if(R){ R.beaten={}; R.progress=0; } }
+      renderSave(); el.innerHTML='<div class="statCard"><div class="statName" style="color:#7fe0a0">かんりょう！</div><div style="font-size:13px;color:#c9a6ff;line-height:1.8;max-width:300px">'+(kind==='lv'?'ぜんいん レベル1に もどしました。':'討伐きろくを けしました。')+'</div><button class="btn" id="pwOk" style="font-size:15px;padding:9px 24px">OK</button></div>'; document.getElementById('pwOk').onclick=function(){ el.hidden=true; }; };
+    document.getElementById('pwClose').onclick=function(){ el.hidden=true; };
+  }
+  document.getElementById('resetLvBtn').addEventListener('click',function(){ showResetModal('lv'); });
+  document.getElementById('resetBeatenBtn').addEventListener('click',function(){ showResetModal('beaten'); });
+  // オーディオ解除（スマホは 最初の タップで AudioContext を resume しないと 音が でない）
+  (function(){ function unlock(){ var a=actx(); if(!a) return; if(a.state==='suspended'){ try{ a.resume(); }catch(e){} } try{ var b=a.createBufferSource(); b.buffer=a.createBuffer(1,1,22050); b.connect(a.destination); b.start(0); }catch(e){} }
+    ['pointerdown','touchend','mousedown','keydown','click'].forEach(function(ev){ document.addEventListener(ev, unlock, {passive:true}); }); })();
 
   function showCharStat(key){ var c=byKey(key), st=cget(key), s=statsFor(st.lv); ensureLearn(key);
     function row(l,v){ return '<div class="statRow"><span>'+l+'</span><b>'+v+'</b></div>'; }
