@@ -113,8 +113,10 @@
   .ecell .en2{ font-family:var(--pop); font-size:9px; color:#fff; line-height:1.15; margin-top:1px; height:2.3em; overflow:hidden; }
   .ecell.boss{ border-color:#ff4d5e; }
   .ecell.boss .en2{ color:#ff8fa3; }
-  .ecell.beaten::after{ content:'✓'; position:absolute; top:3px; right:4px; width:16px; height:16px; border-radius:50%; background:#5be07a; color:#0a3d1a; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,.5); }
-  .ecell.beaten .et,.ecell.beaten .eblack{ opacity:.72; }
+  .ecell.beaten{ opacity:.9; }
+  .ecell.beaten .et,.ecell.beaten .eblack{ filter:grayscale(.95) brightness(.5); }
+  .ecell.beaten .en2{ color:#9a90a5; }
+  .ecell.beaten::after{ content:'討伐'; position:absolute; top:6px; left:4px; right:4px; aspect-ratio:1/1; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(10,4,8,.32); color:#ff3b30; font-family:var(--pop); font-weight:800; font-size:19px; letter-spacing:3px; text-shadow:0 2px 5px rgba(0,0,0,.95); }
   .hubHint{ font-family:var(--pop); font-size:13px; color:#ffd36b; }
   #charStat{ background:rgba(8,5,18,.88); }
   .statCard{ width:100%; max-width:330px; background:linear-gradient(#1c1436,#140e2a); border:2px solid var(--gold); border-radius:18px; padding:14px 16px 18px; display:flex; flex-direction:column; align-items:center; gap:6px; box-shadow:0 10px 40px rgba(0,0,0,.55); }
@@ -139,6 +141,7 @@
   <canvas id="game"></canvas>
   <button id="dodgeBtn">よけろ！</button>
   <button id="topBtn" class="topBtn" hidden>≪ トップ</button>
+  <button id="muteBtn" aria-label="サウンド" style="position:absolute;top:8px;right:8px;z-index:30;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);background:rgba(20,14,40,.7);color:#fff;font-size:18px;cursor:pointer;padding:0">🔊</button>
 
   <!-- MODE SELECT -->
   <div id="modeScreen" class="screen">
@@ -271,6 +274,14 @@
     waterA:{name:'みずでっぽう',pow:140,mp:2,type:'atk',fx:'water'}, waterB:{name:'みずうず',pow:240,mp:8,type:'atk',fx:'water'},
     punchA:{name:'パパパンチ',pow:200,mp:5,type:'atk',fx:'slash'}, punchB:{name:'だいばくれつ',pow:330,mp:15,type:'atk',fx:'slash'}, guardAll:{name:'みんなをまもる',pow:0,mp:6,type:'buffdef',fx:'light'},
     cookA:{name:'ママのてりょうり',pow:160,mp:10,type:'healall',fx:'light'},
+    revive:{name:'いきかえりのうた',pow:55,mp:16,type:'revive',fx:'light'},
+    lifeA:{name:'いのちのきずな',pow:0,mp:9,type:'bufflife',fx:'heart'},
+    multiA:{name:'みだれ斬り',pow:80,mp:8,type:'multi',fx:'slash'},
+    trueA:{name:'ぼうぎょくずし',pow:150,mp:9,type:'true',fx:'slash'},
+    poisonA:{name:'どくのぬま',pow:70,mp:7,type:'poison',fx:'water'},
+    stunA:{name:'しびれショット',pow:120,mp:8,type:'stun',fx:'gun'},
+    drainA:{name:'せいきゅうしゅう',pow:170,mp:9,type:'drain',fx:'heart'},
+    regenA:{name:'いやしのけっかい',pow:0,mp:10,type:'regen',fx:'light'},
     cheerA:{name:'えがおでおうえん',pow:0,mp:5,type:'buffatk',fx:'cheer'}, cheerB:{name:'おうえんのうた',pow:130,mp:9,type:'healall',fx:'cheer'},
     rainA:{name:'にじのブレス',pow:280,mp:12,type:'atk',fx:'rainbow'}, rainB:{name:'しん・にじブレス',pow:430,mp:24,type:'atk',fx:'rainbow'},
     // 共通わざ（全キャラが後半で おぼえる）
@@ -291,8 +302,21 @@
     { key:'yura',     name:'ゆら',    color:'#ff9ec2', fx:'cheer',   ult:'buff', skill:'みんなでおうえん',   ability:'ひっさつ＝5びょう みんな こうげきUP',       learn:[[1,'cheerA'],[20,'cheerB']] },
     { key:'ryudou',   name:'リュウドウ', color:'#ffcf4a', fx:'rainbow', ult:'dmg', skill:'にじのブレス',       ability:'にじの龍。ひっさつ＝さいきょう ダメージ',   learn:[[1,'rainA'],[70,'rainB']] }
   ];
-  CHARS.forEach(function(c){ c.learn=c.learn.concat(GEN); }); // 各キャラ 固有3 + 共通7 = 10わざ
+  // 各キャラの「シグネチャー」おもしろスキル
+  var SIG={ sakutaro:[30,'multiA'], papa:[30,'trueA'], ayaka:[25,'revive'], haruka:[28,'stunA'], kapparu:[30,'poisonA'], hayu:[26,'regenA'], kika:[33,'drainA'], subaru:[24,'lifeA'] };
+  CHARS.forEach(function(c){ if(SIG[c.key]) c.learn.push(SIG[c.key]); });
+  CHARS.forEach(function(c){ c.learn=c.learn.concat(GEN); }); // 固有＋シグネチャー＋共通
   function byKey(k){ for(var i=0;i<CHARS.length;i++) if(CHARS[i].key===k) return CHARS[i]; }
+
+  // ===== タイプ相性（ポケモン風・5すくみ） けん→ほのお→みず→ひかり→やみ→けん =====
+  var TYPES={ ken:{name:'けん',col:'#c3ccdb',mark:'⚔'}, hono:{name:'ほのお',col:'#ff7a3c',mark:'🔥'}, mizu:{name:'みず',col:'#3aa6ff',mark:'💧'}, hikari:{name:'ひかり',col:'#ffd24a',mark:'✨'}, yami:{name:'やみ',col:'#a86bff',mark:'🌙'} };
+  var TYPECYCLE=['ken','hono','mizu','hikari','yami']; // 各タイプは 次のタイプに つよい
+  function typeMult(atk,def){ if(!atk||!def||atk===def) return 1; var ia=TYPECYCLE.indexOf(atk), id=TYPECYCLE.indexOf(def); if(ia<0||id<0) return 1;
+    if((ia+1)%5===id) return 1.6;      // こうかばつぐん
+    if((id+1)%5===ia) return 0.65;     // いまひとつ
+    return 1; }
+  var ALLYTYPE={ sakutaro:'ken', papa:'ken', haruka:'hono', ryudou:'hono', kapparu:'mizu', yura:'mizu', ayaka:'hikari', hayu:'hikari', kika:'yami', subaru:'yami' };
+  CHARS.forEach(function(c){ c.type=ALLYTYPE[c.key]||'ken'; });
 
   // ===== shared character progression（共通レベル：アクション/RPG 両モードで共有・永続） =====
   var CSKEY='sd_chars_v1';
@@ -328,7 +352,33 @@
   function actx(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;} } return AC; }
   function beep(f,d,t,v,to){ if(muted)return; var a=actx(); if(!a)return; var o=a.createOscillator(),g=a.createGain(); o.type=t||'sine'; o.frequency.setValueAtTime(f,a.currentTime); if(to)o.frequency.exponentialRampToValueAtTime(to,a.currentTime+d); g.gain.setValueAtTime(v||0.13,a.currentTime); g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d); o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime+d+0.02); }
   function noise(d,v){ if(muted)return; var a=actx(); if(!a)return; var n=a.createBufferSource(); var buf=a.createBuffer(1,a.sampleRate*d,a.sampleRate),dd=buf.getChannelData(0); for(var i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*(1-i/dd.length); n.buffer=buf; var g=a.createGain(); g.gain.value=v||0.14; var f=a.createBiquadFilter(); f.type='highpass'; f.frequency.value=700; n.connect(f); f.connect(g); g.connect(a.destination); n.start(); }
-  var SFX={ slash:function(){noise(0.1,0.12);beep(900,0.1,'triangle',0.07,1500);}, gun:function(){beep(1200,0.06,'square',0.08,600);}, water:function(){beep(500,0.14,'sine',0.09,900);noise(0.06,0.06);}, heart:function(){beep(700,0.25,'sine',0.11,1200);}, summon:function(){beep(300,0.2,'sawtooth',0.11,500);}, rainbow:function(){[400,600,800,1100].forEach(function(f,i){setTimeout(function(){beep(f,0.28,'triangle',0.1);},i*70);});}, light:function(){beep(900,0.4,'sine',0.1,1600);}, cheer:function(){[600,800,1000].forEach(function(f,i){setTimeout(function(){beep(f,0.14,'square',0.09);},i*80);});}, dodge:function(){beep(1500,0.12,'square',0.1,900);noise(0.05,0.06);}, hurt:function(){beep(180,0.3,'sawtooth',0.16,70);}, warn:function(){beep(500,0.18,'sawtooth',0.12,780);}, lvup:function(){[660,880,1180].forEach(function(f,i){setTimeout(function(){beep(f,0.2,'triangle',0.12);},i*70);});}, charm:function(){beep(400,0.4,'sawtooth',0.14,120);}, rescue:function(){beep(900,0.2,'triangle',0.12,1500);}, kill:function(){beep(500,0.4,'triangle',0.12,1000);}, boss:function(){[523,659,784,1047].forEach(function(f,i){setTimeout(function(){beep(f,0.35,'triangle',0.13);},i*130);});} };
+  function jit(v){ return v*(0.86+Math.random()*0.28); }
+  var SFX={
+    slash:function(){ noise(0.09,0.11); beep(jit(950),0.09,'triangle',0.07,jit(1500)); if(Math.random()<0.4)setTimeout(function(){noise(0.06,0.08);beep(jit(1200),0.07,'triangle',0.06,jit(1800));},70); },
+    gun:function(){ var n=2+(Math.random()<0.5?1:0); for(var i=0;i<n;i++)(function(i){setTimeout(function(){beep(jit(1250),0.05,'square',0.07,jit(600));},i*55);})(i); },
+    water:function(){ beep(jit(520),0.14,'sine',0.09,jit(950)); noise(0.05,0.05); if(Math.random()<0.5)setTimeout(function(){beep(jit(760),0.1,'sine',0.07,jit(1100));},90); },
+    heart:function(){ beep(jit(720),0.22,'sine',0.1,jit(1250)); setTimeout(function(){beep(jit(980),0.16,'sine',0.08,jit(1400));},80); },
+    summon:function(){ beep(jit(300),0.22,'sawtooth',0.11,jit(520)); noise(0.1,0.05); },
+    rainbow:function(){ [400,600,800,1100,1400].forEach(function(f,i){ setTimeout(function(){ beep(jit(f),0.26,'triangle',0.1); },i*65); }); },
+    light:function(){ beep(jit(920),0.36,'sine',0.1,jit(1650)); if(Math.random()<0.5)setTimeout(function(){beep(jit(1300),0.2,'sine',0.06,jit(1900));},110); },
+    cheer:function(){ [600,800,1000].forEach(function(f,i){ setTimeout(function(){ beep(jit(f),0.14,'square',0.09); },i*80); }); },
+    dodge:function(){ beep(1500,0.12,'square',0.1,900); noise(0.05,0.06); },
+    hurt:function(){ beep(jit(185),0.28,'sawtooth',0.15,70); noise(0.05,0.06); },
+    warn:function(){ beep(500,0.18,'sawtooth',0.12,780); },
+    lvup:function(){ [660,880,1180,1560].forEach(function(f,i){ setTimeout(function(){ beep(f,0.2,'triangle',0.12); },i*80); }); },
+    charm:function(){ beep(400,0.4,'sawtooth',0.14,120); },
+    rescue:function(){ beep(900,0.2,'triangle',0.12,1500); },
+    kill:function(){ beep(jit(520),0.4,'triangle',0.12,jit(900)); noise(0.14,0.08); },
+    boss:function(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ beep(f,0.35,'triangle',0.13); },i*130); }); } };
+  // ---- BGM（通常戦・中ボス戦で曲がかわる）----
+  var BGM=(function(){ var timer=null, step=0, cur=null;
+    var THEMES={ normal:{tempo:250, base:196, notes:[0,3,7,10,0,3,7,3], bassEvery:4, wave:'triangle', lp:1300, vol:0.045, bass:0.06},
+                 mid:{tempo:186, base:138, notes:[0,1,5,6,0,1,8,7], bassEvery:2, wave:'sawtooth', lp:850, vol:0.05, bass:0.085} };
+    function tick(){ var a=actx(); if(!a||muted||!cur) return; var T=THEMES[cur]; var n=T.notes[step%T.notes.length]; var f=T.base*Math.pow(2,n/12);
+      var o=a.createOscillator(),g=a.createGain(),lp=a.createBiquadFilter(); o.type=T.wave; o.frequency.value=f; lp.type='lowpass'; lp.frequency.value=T.lp; g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.linearRampToValueAtTime(T.vol,a.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+(T.tempo/1000)*0.92); o.connect(lp); lp.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime+T.tempo/1000);
+      if(step%T.bassEvery===0){ var bo=a.createOscillator(),bg=a.createGain(); bo.type='sine'; bo.frequency.value=T.base/2*Math.pow(2,n/12); bg.gain.setValueAtTime(T.bass,a.currentTime); bg.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.5); bo.connect(bg); bg.connect(a.destination); bo.start(); bo.stop(a.currentTime+0.55); } step++; }
+    return { play:function(theme){ theme=THEMES[theme]?theme:'normal'; var a=actx(); if(a&&a.state==='suspended'){try{a.resume();}catch(e){}} if(cur===theme&&timer) return; cur=theme; step=0; if(timer)clearInterval(timer); timer=setInterval(tick, THEMES[theme].tempo); },
+      stop:function(){ cur=null; if(timer){clearInterval(timer);timer=null;} } }; })();
 
   // ---------- selection (action) ----------
   var MAXSEL=3, selected=['sakutaro','papa','ayaka'];
@@ -414,7 +464,7 @@
       +'<div class="statName" style="color:'+c.color+'">'+c.name+'</div>'
       +'<div class="statRole">'+(c.ability||'')+'</div>'
       +'<div class="statLv">Lv '+st.lv+(st.lv<100?'　つぎまで '+Math.max(0,nextExp(st.lv)-st.exp)+' けいけん':'　（さいだいレベル）')+'</div>'
-      +'<div class="statGrid">'+row('HP',s.hpMax)+row('MP',s.mpMax)+row('こうげき',s.atk)+row('ぼうぎょ',s.def)+row('すばやさ',s.spd)+row('おぼえた',st.learned.length+'／10')+'</div>'
+      +'<div class="statGrid">'+row('HP',s.hpMax)+row('MP',s.mpMax)+row('こうげき',s.atk)+row('ぼうぎょ',s.def)+row('すばやさ',s.spd)+row('おぼえた',st.learned.length+'／'+c.learn.length)+'</div>'
       +'<div class="statSkills"><b>とくぎ</b>　つかえるのは 5つまで（★＝セット中／タップで へんこう）<div style="font-size:10px;color:#9ad6ff;margin:2px 0 4px">いま '+st.equipped.length+'／'+EQMAX+' セット中</div><div class="skillList">'+learnedH+'</div><div class="skillWarn" style="font-size:10px;color:#ff9ec2;min-height:12px"></div></div>'
       +'<div class="statUlt">ひっさつ（'+c.skill+'）：'+ultTxt+'</div>'
       +'<button class="btn" id="statClose" style="font-size:16px;padding:10px 26px">とじる</button></div>';
@@ -431,8 +481,9 @@
     document.getElementById('statClose').onclick=function(){ el.hidden=true; };
   }
   function hideAll(){ document.getElementById('charStat').hidden=true; [modeScreen,titleScreen,helpScreen,winScreen,loseScreen,document.getElementById('rpgPick'),document.getElementById('rpgStory'),document.getElementById('rpgUI'),document.getElementById('questHub')].forEach(function(e){ e.hidden=true; }); setDodge(false); }
-  function toTop(){ MODE='menu'; hideAll(); modeScreen.hidden=false; topBtn.hidden=true; renderSave(); }
+  function toTop(){ MODE='menu'; hideAll(); modeScreen.hidden=false; topBtn.hidden=true; renderSave(); BGM.stop(); }
   topBtn.addEventListener('click',toTop);
+  (function(){ var mb=document.getElementById('muteBtn'); try{ muted=(localStorage.getItem('sd_muted')==='1'); }catch(e){} mb.textContent=muted?'🔇':'🔊'; mb.addEventListener('click',function(){ muted=!muted; mb.textContent=muted?'🔇':'🔊'; try{ localStorage.setItem('sd_muted',muted?'1':'0'); }catch(e){} if(!muted){ var a=actx(); if(a&&a.state==='suspended'){try{a.resume();}catch(e){}} } }); })();
   document.getElementById('modeAction').addEventListener('click',function(){ actx(); hideAll(); titleScreen.hidden=false; topBtn.hidden=false; });
   document.getElementById('modeRpg').addEventListener('click',function(){ actx(); hideAll(); topBtn.hidden=false; rpgStart(); });
 
@@ -447,7 +498,7 @@
   // ========================================================= ACTION MODE =========================================================
   function startGame(){ LASTMODE='action'; MODE='action'; hideAll(); topBtn.hidden=false; SAVE.plays++; persist();
     G.party=selected.map(function(k){ var st=cget(k); ensureLearn(k); return { c:byKey(k), lv:st.lv, cd:0, gauge:0, charmed:false, rescue:0, atkAnim:0, x:0,y:0,hx:0,hy:0,w:0,h:0 }; });
-    layoutParty(true); G.hearts=G.maxHearts; G.stageIdx=0; G.effects.length=0; G.particles.length=0; G.floaters.length=0; G.shake=0; G.hitFlash=0; G.buffT=0; G.totalHits=0; G.started=G.time; G.charmActive=false; spawnEnemy(0); }
+    layoutParty(true); G.hearts=G.maxHearts; G.stageIdx=0; G.effects.length=0; G.particles.length=0; G.floaters.length=0; G.shake=0; G.hitFlash=0; G.buffT=0; G.totalHits=0; G.started=G.time; G.charmActive=false; spawnEnemy(0); BGM.play('normal'); }
   function layoutParty(snap){ if(!G.party||!G.party.length) return; var n=G.party.length, cw=Math.min(W*0.29,120), ch=cw*1.28, gap=(W-n*cw)/(n+1), by=H-ch-46; G.party.forEach(function(s,i){ s.w=cw; s.h=ch; s.hx=gap+i*(cw+gap)+cw/2; s.hy=by+ch/2; if(snap){ s.x=s.hx; s.y=s.hy; } }); }
   function setDodge(on){ dodgeBtn.classList.toggle('show',on); }
   function spawnEnemy(idx){ var st=STAGES[idx]; G.enemy={ st:st, hp:st.hp, maxHp:st.hp, x:W/2, y:H*0.24, r:Math.min(W,H)*(st.boss?0.16:st.mid?0.15:0.12), bob:0, flash:0, flinch:0, dead:false, dieT:0, wing:0 };
@@ -482,9 +533,9 @@
     else if(G.aphase==='telegraph'){ if(G.tPhase>=G.telDur){ setDodge(false); if(!G.dodged){ var dmg=en.st.atk+(G.charmActive?1:0); G.hearts-=dmg; G.shake=18; SFX.hurt(); G.floaters.push({ x:W/2,y:H*0.44,vy:-40,age:0,life:0.9,text:'いたっ！ -'+dmg+'♥',color:'#ff7a90',big:true }); if(G.hearts<=0){ aLose(); return; } } G.aphase='battle'; G.tPhase=0; G.nextAtk=en.st.gap*(0.7+Math.random()*0.4); } }
     else if(G.aphase==='clear'){ if(G.tPhase>=1.5){ if(G.stageIdx<STAGES.length-1){ G.stageIdx++; spawnEnemy(G.stageIdx); } else { aWin(); } } } }
   function tryCharm(){ var avail=G.party.filter(function(s){ return !s.charmed; }); if(avail.length<=1){ G.charmTimer=0; G.nextCharm=8; return; } var s=avail[Math.floor(Math.random()*avail.length)]; s.charmed=true; s.rescue=0; G.charmActive=true; G.charmTimer=0; G.nextCharm=5+Math.random()*2.5; var side=(s.hx<W/2)?-1:1; s.charmSlotX=G.enemy.x+side*W*0.24; s.charmSlotY=G.enemy.y+H*0.02; SFX.charm(); G.shake=14; G.floaters.push({ x:s.x,y:s.y-s.h/2,vy:-30,age:0,life:1.4,text:s.c.name+' が あやつられた！',color:'#c060ff',big:true }); }
-  function aWin(){ LASTMODE='action'; MODE='menu'; setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').textContent='せかいを すくった！'; document.getElementById('winMsg').textContent=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML=G.party.map(function(s){ return s.c.name+' Lv'+s.lv; }).join('　')+'<br>こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span>'; winScreen.hidden=false; SFX.boss();
+  function aWin(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); var t=Math.max(1,Math.round(G.time-G.started)); document.getElementById('winTitle').textContent='せかいを すくった！'; document.getElementById('winMsg').textContent=G.playerName+' たちが BLACK を たおした！'; document.getElementById('winStats').innerHTML=G.party.map(function(s){ return s.c.name+' Lv'+s.lv; }).join('　')+'<br>こうげき <span>'+G.totalHits+'かい</span>　タイム <span>'+t+'びょう</span>'; winScreen.hidden=false; SFX.boss();
     SAVE.clears++; SAVE.actClears++; SAVE.bestStage=Math.max(SAVE.bestStage,STAGES.length); if(!SAVE.bestTime||t<SAVE.bestTime)SAVE.bestTime=t; record('action','クリア','ステージ'+STAGES.length+'・'+t+'秒'); }
-  function aLose(){ LASTMODE='action'; MODE='menu'; setDodge(false); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
+  function aLose(){ LASTMODE='action'; MODE='menu'; BGM.stop(); setDodge(false); loseScreen.hidden=false; var reached=G.stageIdx+1; SAVE.bestStage=Math.max(SAVE.bestStage,reached); record('action','ざんねん','ステージ'+reached); }
 
   // ========================================================= RPG MODE =========================================================
   // ===== 100-enemy quest (図鑑どおりの名前・系統) =====
@@ -503,27 +554,37 @@
   ];
   var QMAX=MONBOOK.length+1; // 100体 + ラスボスBLACK(101体目)
   var LASTN=MONBOOK.length;  // 100 = 終焉の魔王（クエスト最後の中ボス級）
+  var KEITYPE={ 'スライム系':'mizu','アンデッド系':'yami','精霊系':'hikari','魔族系':'yami','魔法生物系':'hikari','魔王系':'yami','ドラゴン系':'hono','龍系':'mizu','鳥系':'hikari','獣系':'ken','魔獣系':'hono','海洋系':'mizu','物質系':'ken','植物系':'mizu','亜人系':'ken','人型系':'ken' };
+  // ===== 難易度バランス（3人 LvN で N体目を ギリギリ 想定） 調整パラメータ =====
+  var BAL={ hp0:108, hpK:35, atk0:13, atkK:4.1, def0:1.5, defK:0.9, spd0:7, spdK:0.5, exp0:14, expK:6.4, bossHp:1.7, bossAtk:1.12, bossDef:1.08, bossExp:2.6 };
+  function eStat(N,kind){ var hp=BAL.hp0+BAL.hpK*N, atk=BAL.atk0+BAL.atkK*N, def=BAL.def0+BAL.defK*N, spd=BAL.spd0+BAL.spdK*N, exp=BAL.exp0+BAL.expK*N;
+    if(kind==='boss'){ hp*=BAL.bossHp; atk*=BAL.bossAtk; def*=BAL.bossDef; exp*=BAL.bossExp; }
+    if(kind==='mid'){ hp*=2.05; atk*=1.24; def*=1.14; spd*=1.1; exp*=4.5; }        // 中ボス（20ごと）＝激強
+    if(kind==='last'){ hp*=2.6; atk*=1.3; def*=1.18; spd*=1.1; exp=2600; }         // #100 終焉の魔王
+    return { hp:Math.round(hp), atk:Math.round(atk), def:Math.round(def), spd:Math.round(spd), exp:Math.round(exp) }; }
   var ENEMIES=MONBOOK.map(function(mb,idx){ var N=idx+1, kei=mb[1], art=KEIART[kei]||'golem', no=('00'+N).slice(-3);
-    var boss=(N%10===0);
-    var e={ no:N, name:mb[0], kei:kei, art:art, sprite:'mon'+no, col:'#7c3fd6' };
-    if(N===LASTN){ e.boss=true; e.hp=5200; e.atk=46; e.def=42; e.spd=56; e.exp=2600; e.skills=[{name:'しゅうえんのいちげき',pow:150,type:'atk'},{name:'しゅうえんのいちげき',pow:150,type:'atk'},{name:'あんこくは',pow:65,type:'atkall'}]; }
-    else if(boss){ e.boss=true; e.hp=Math.round((30+N*22+N*N*0.28)*1.4); e.atk=Math.round(6+N*0.6); e.def=Math.round(5+N*0.78); e.spd=Math.round(8+N*0.5); e.exp=Math.round(90+N*40); e.skills=[{name:'ごうだ',pow:130,type:'atk'},{name:'ごうだ',pow:130,type:'atk'},{name:'なぎはらい',pow:65,type:'atkall'}]; }
-    else { e.hp=Math.round(30+N*14+N*N*0.32); e.atk=Math.round(6+N*0.9); e.def=Math.round(3+N*0.72); e.spd=Math.round(7+N*0.45); e.exp=Math.round(22+N*15); e.skills=[{name:'こうげき',pow:100,type:'atk'}].concat(N>15?[{name:'とっしん',pow:120,type:'atk'}]:[]).concat(N>35?[{name:'ぜんたいこうげき',pow:58,type:'atkall'}]:[]); }
+    var tier=(N===LASTN)?'last':((N%20===0)?'mid':((N%10===0)?'boss':'norm'));
+    var e={ no:N, name:mb[0], kei:kei, art:art, sprite:'mon'+no, col:'#7c3fd6', type:KEITYPE[kei]||'ken', tier:tier, boss:(tier!=='norm'), mid:(tier==='mid'||tier==='last') };
+    var s=eStat(N,tier); e.hp=s.hp; e.atk=s.atk; e.def=s.def; e.spd=s.spd; e.exp=s.exp;
+    if(tier==='last'){ e.skills=[{name:'しゅうえんのいちげき',pow:150,type:'atk'},{name:'しゅうえんのいちげき',pow:150,type:'atk'},{name:'あんこくは',pow:90,type:'atkall'},{name:'あんこくは',pow:90,type:'atkall'}]; }
+    else if(tier==='mid'){ e.skills=[{name:'メガインパクト',pow:140,type:'atk'},{name:'メガインパクト',pow:140,type:'atk'},{name:'ぜんめつのいちげき',pow:88,type:'atkall'},{name:'ぜんめつのいちげき',pow:88,type:'atkall'}]; }
+    else if(tier==='boss'){ e.skills=[{name:'ごうだ',pow:130,type:'atk'},{name:'ごうだ',pow:130,type:'atk'},{name:'なぎはらい',pow:75,type:'atkall'}]; }
+    else { e.skills=[{name:'こうげき',pow:100,type:'atk'}].concat(N>15?[{name:'とっしん',pow:118,type:'atk'}]:[]).concat(N>35?[{name:'ぜんたいこうげき',pow:72,type:'atkall'}]:[]); }
     return e;
   });
   // 101体目 = ラスボス BLACK（キービジュの魔王）
-  ENEMIES.push({ no:QMAX, name:'まおう BLACK', kei:'魔王系', art:'black', sprite:'', col:'#c0104a', boss:true, black:true, hp:7000, atk:56, def:50, spd:62, exp:0, skills:[{name:'あんこくだん',pow:150,type:'atk'},{name:'あんこくだん',pow:150,type:'atk'},{name:'ぜつぼうのは',pow:65,type:'atkall'}] });
+  ENEMIES.push({ no:QMAX, name:'まおう BLACK', kei:'魔王系', art:'black', sprite:'', col:'#c0104a', boss:true, black:true, mid:true, tier:'black', type:'yami', hp:7200, atk:Math.round((BAL.atk0+BAL.atkK*101)*1.12), def:Math.round((BAL.def0+BAL.defK*101)*1.08), spd:64, exp:0, skills:[{name:'あんこくだん',pow:135,type:'atk'},{name:'あんこくだん',pow:135,type:'atk'},{name:'ぜつぼうのは',pow:75,type:'atkall'}] });
   // per-enemy sprite images (mon001..mon100) — BLACK(101) uses drawBlackFace, no sprite
   var SPRIMG={}; for(var _si=1;_si<=LASTN;_si++){ (function(n){ var no=('00'+n).slice(-3); var im=new Image(); im.src=(window.SPRDATA&&window.SPRDATA['mon'+no])||('mon'+no+'.png'); SPRIMG['mon'+no]=im; })(_si); }
   function enemyImg(en){ var s=en.sprite&&SPRIMG[en.sprite]; if(s&&s.complete&&s.naturalWidth>0) return s; var m=MONIMG[en.art]; if(m&&m.complete&&m.naturalWidth>0) return m; return null; }
 
   var ACTIVE_CAP=3;
-  var R={ progress:0, beaten:{}, party:[], active:[], enemy:null, order:[], oi:0, curAlly:0, actions:[], timer:0, sub:'hub', effects:[], particles:[], floaters:[], shake:0, hitFlash:0, buffAtk:0, buffDef:0, msg:[], msgi:0, pickSel:[], pendingLevelMsgs:[] };
+  var R={ progress:0, beaten:{}, party:[], active:[], enemy:null, order:[], oi:0, curAlly:0, actions:[], timer:0, sub:'hub', effects:[], particles:[], floaters:[], shake:0, hitFlash:0, buffAtk:0, buffDef:0, buffLife:0, buffRegen:0, regenAmt:0, msg:[], msgi:0, pickSel:[], pendingLevelMsgs:[] };
   var storyEl=document.getElementById('rpgStory'), storyTextEl=document.getElementById('storyText'), rpgUI=document.getElementById('rpgUI'), rpgLog=document.getElementById('rpgLog'), rpgCmd=document.getElementById('rpgCmd');
   var pickScreen=document.getElementById('rpgPick'), pickBox=document.getElementById('pickBox'), pickInfo=document.getElementById('pickInfo'), hubScreen=document.getElementById('questHub');
 
   function statsFor(lv){ return { hpMax:Math.round(30+lv*9), mpMax:Math.round(12+lv*2.4), atk:Math.round(7+lv*2.3), def:Math.round(4+lv*1.3), spd:Math.round(8+lv*0.9) }; }
-  function nextExp(lv){ return Math.round(12*Math.pow(lv,1.5)); }
+  function nextExp(lv){ return Math.round(16*Math.pow(lv,1.55)); }
   function mkMember(k){ var c=byKey(k); var st=cget(k); ensureLearn(k); var m={ c:c, lv:st.lv, exp:st.exp, learned:st.learned.slice(), equipped:st.equipped.slice(), hp:0, mp:0, guard:false, x:0,y:0,hpMax:0,mpMax:0,atk:0,def:0,spd:0, hitFx:0 }; recalc(m); m.hp=m.hpMax; m.mp=m.mpMax; return m; }
   function recalc(m){ var s=statsFor(m.lv); m.hpMax=s.hpMax; m.mpMax=s.mpMax; m.atk=s.atk; m.def=s.def; m.spd=s.spd; }
   function syncMember(m){ var st=cget(m.c.key); m.lv=st.lv; m.learned=st.learned.slice(); recalc(m); }
@@ -538,7 +599,7 @@
   function rpgStart(){ LASTMODE='rpg'; SAVE.plays++; persist(); hideAll(); topBtn.hidden=false; R.effects.length=0; R.particles.length=0; R.floaters.length=0; R.shake=0; loadQuest(); showHub(); }
 
   function enemyThumbUrl(en){ if(en.black) return null; var key=en.sprite||('mon'+('00'+en.no).slice(-3)); return (window.SPRDATA&&window.SPRDATA[key])||(key+'.png'); }
-  function showHub(){ MODE='menu'; R.sub='hub'; storyEl.hidden=true; rpgUI.hidden=true; pickScreen.hidden=true; hubScreen.hidden=false; topBtn.hidden=false;
+  function showHub(){ MODE='menu'; R.sub='hub'; BGM.stop(); storyEl.hidden=true; rpgUI.hidden=true; pickScreen.hidden=true; hubScreen.hidden=false; topBtn.hidden=false;
     var beat=R.progress, all=(beat>=QMAX);
     var cells=ENEMIES.map(function(en,idx){ var no=('00'+en.no).slice(-3); var done=R.beaten[en.no]?' beaten':''; var boss=en.boss?' boss':'';
       var thumb=en.black ? '<div class="eblack">BLACK</div>' : '<img class="et" loading="lazy" src="'+enemyThumbUrl(en)+'" alt="">';
@@ -571,9 +632,9 @@
   function refreshPick(){ [].forEach.call(pickBox.children,function(cell){ var on=R.pickSel.indexOf(cell._key)>=0; cell.classList.toggle('sel',on); cell.classList.toggle('dim',!on&&R.pickSel.length>=ACTIVE_CAP); }); var n=R.pickSel.length; pickInfo.innerHTML=ACTIVE_CAP+'人 えらぼう！ <small>いま '+n+'人'+(n<ACTIVE_CAP?'（あと '+(ACTIVE_CAP-n)+'人）':'　じゅんび OK！')+'</small>'; document.getElementById('pickStart').disabled=(n!==ACTIVE_CAP); }
   document.getElementById('pickStart').addEventListener('click',function(){ if(R.pickSel.length!==ACTIVE_CAP) return; R.active=R.pickSel.map(function(k){ return R.party.filter(function(m){return m.c.key===k;})[0]; }); pickScreen.hidden=true; beginBattle(R.pendingBattle); });
 
-  function beginBattle(edef){ MODE='rpg'; hubScreen.hidden=true; R.enemy={ def:edef, no:edef.no, name:edef.name, art:edef.art, sprite:edef.sprite, kei:edef.kei, col:edef.col, black:!!edef.black, boss:!!edef.boss, hp:edef.hp, hpMax:edef.hp, atk:edef.atk, dfn:edef.def, spd:edef.spd, exp:edef.exp, skills:edef.skills, x:W/2, y:H*0.26, r:Math.min(W,H)*(edef.boss?0.15:0.12), bob:0, flash:0, flinch:0, dead:false, dieT:0, wing:0 };
-    R.buffAtk=0; R.buffDef=0; R.active.forEach(function(m){ m.guard=false; m.hitFx=0; m.hp=m.hpMax; m.mp=m.mpMax; }); layoutRpg(); R.sub='input'; R.curAlly=0; R.actions=[]; storyEl.hidden=true; pickScreen.hidden=true; rpgUI.hidden=false; setLog(R.enemy.name+' が あらわれた！'); nextAllyInput(); }
-  function layoutRpg(){ var n=R.active.length, cw=Math.min((W-20)/n-8, 92), ch=cw*1.3, gap=(W-n*cw)/(n+1), by=H*0.52; R.active.forEach(function(m,i){ m.w=cw; m.h=ch; m.x=gap+i*(cw+gap)+cw/2; m.y=by; }); }
+  function beginBattle(edef){ MODE='rpg'; hubScreen.hidden=true; R.enemy={ def:edef, no:edef.no, name:edef.name, art:edef.art, sprite:edef.sprite, kei:edef.kei, col:edef.col, type:edef.type, black:!!edef.black, boss:!!edef.boss, mid:!!edef.mid, tier:edef.tier, hp:edef.hp, hpMax:edef.hp, atk:edef.atk, dfn:edef.def, spd:edef.spd, exp:edef.exp, skills:edef.skills, x:W/2, y:H*0.26, r:Math.min(W,H)*(edef.boss?0.15:0.12), bob:0, flash:0, flinch:0, dead:false, dieT:0, wing:0 };
+    R.buffAtk=0; R.buffDef=0; R.buffLife=0; R.buffRegen=0; R.active.forEach(function(m){ m.guard=false; m.hitFx=0; m.hp=m.hpMax; m.mp=m.mpMax; }); layoutRpg(); R.sub='input'; R.curAlly=0; R.actions=[]; storyEl.hidden=true; pickScreen.hidden=true; rpgUI.hidden=false; setLog(R.enemy.name+' が あらわれた！'); BGM.play(edef.mid?'mid':'normal'); nextAllyInput(); }
+  function layoutRpg(){ var n=R.active.length, cw=Math.min((W-20)/n-8, 96), ch=cw*1.3, gap=(W-n*cw)/(n+1); var feetY=H-150; R.active.forEach(function(m,i){ m.w=cw; m.h=ch; m.x=gap+i*(cw+gap)+cw/2; m.y=feetY-ch/2; }); }
   function setLog(t){ rpgLog.textContent=t; }
 
   function nextAllyInput(){ // find next alive ally needing a command
@@ -594,13 +655,16 @@
   function chooseAction(m,act){ act.actor=m; R.actions.push(act); R.curAlly++; nextAllyInput(); }
 
   function startExec(){ R.sub='exec'; rpgCmd.innerHTML=''; rpgCmd.className='';
-    if(R.buffAtk>0)R.buffAtk--; if(R.buffDef>0)R.buffDef--;
+    if(R.buffAtk>0)R.buffAtk--; if(R.buffDef>0)R.buffDef--; if(R.buffLife>0)R.buffLife--;
     // build order: allies with actions + enemy, by spd
     var units=[]; R.actions.forEach(function(a){ if(a.actor.hp>0) units.push({ ally:a.actor, act:a, spd:a.actor.spd+(a.kind==='guard'?999:0) }); });
     units.push({ enemy:R.enemy, spd:R.enemy.spd });
     units.sort(function(a,b){ return b.spd-a.spd; });
     R.order=units; R.oi=0; R.timer=0.4; }
   function execStep(){ if(R.oi>=R.order.length){ // end of round
+      var pen=R.enemy;
+      if(pen && pen.poison && pen.hp>0){ var pd=pen.poison.d; pen.hp-=pd; floatR(pen.x+(Math.random()-0.5)*pen.r,pen.y,String(pd),'#9dff6a'); rpgBurst(pen.x,pen.y,'#7bd06a'); pen.poison.t--; if(pen.poison.t<=0)pen.poison=null; if(pen.hp<=0){ pen.hp=0; pen.dead=true; pen.dieT=0; SFX.kill(); R.shake=14; } }
+      if(R.buffRegen>0){ var rh=R.regenAmt||10; R.active.forEach(function(t){ if(t.hp>0){ t.hp=Math.min(t.hpMax,t.hp+rh); floatR(t.x,t.y-24,'+'+rh,'#7dff9a'); } }); R.buffRegen--; }
       R.active.forEach(function(m){ m.guard=false; }); if(checkEnd()) return; R.sub='input'; R.curAlly=0; R.actions=[]; nextAllyInput(); return; }
     var u=R.order[R.oi]; R.oi++;
     if(u.enemy){ if(R.enemy.dead){ R.timer=0.05; return; } enemyAct(); R.timer=0.8; }
@@ -610,19 +674,31 @@
     if(a.kind==='guard'){ m.guard=true; setLog(m.c.name+' は みを まもっている！'); return; }
     var sk = a.kind==='attack' ? { name:'こうげき', pow:100, mp:0, type:'atk', fx:m.c.fx } : SKILLS[a.key];
     if(a.kind==='skill') m.mp=Math.max(0,m.mp-sk.mp);
-    var atkVal=m.atk*(R.buffAtk>0?1.4:1);
-    if(sk.type==='atk'){ var dmg=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*(0.9+Math.random()*0.2))); rpgHitEnemy(dmg, m.c.color, sk.fx); setLog(m.c.name+' の '+sk.name+'！　'+dmg+' ダメージ！'); }
+    var atkVal=m.atk*(R.buffAtk>0?1.4:1), tm=typeMult(m.c.type, en.type);
+    function lif(d){ if(R.buffLife>0 && d>0){ var h=Math.max(1,Math.round(d*0.4)); m.hp=Math.min(m.hpMax,m.hp+h); floatR(m.x,m.y-30,'+'+h,'#ff9ec2'); } }
+    function effTxt(){ return tm>1?'　こうかばつぐん！':(tm<1?'　いまひとつ…':''); }
+    function effFloat(){ if(tm!==1) floatR(en.x,en.y-en.r*0.7,tm>1?'こうかバツグン!':'いまひとつ…',tm>1?'#ffe36b':'#9fb0c0'); }
+    if(sk.type==='atk'){ var dmg=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*(0.9+Math.random()*0.2)*tm)); rpgHitEnemy(dmg, m.c.color, sk.fx); lif(dmg); setLog(m.c.name+' の '+sk.name+'！　'+dmg+' ダメージ！'+effTxt()); effFloat(); }
+    else if(sk.type==='true'){ var dt=Math.max(1,Math.round(atkVal*sk.pow/100*(0.9+Math.random()*0.2)*tm)); rpgHitEnemy(dt,m.c.color,sk.fx); lif(dt); setLog(m.c.name+' の '+sk.name+'！　ぼうぎょを むし！　'+dt+' ダメージ！'+effTxt()); effFloat(); }
+    else if(sk.type==='multi'){ var hits=2+(Math.random()<0.55?1:0), tot=0; for(var hh=0;hh<hits;hh++){ var dm=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*(0.85+Math.random()*0.3)*tm)); rpgHitEnemy(dm,m.c.color,sk.fx); tot+=dm; } lif(tot); setLog(m.c.name+' の '+sk.name+'！　'+hits+'かい ヒット！　ごうけい '+tot+'！'+effTxt()); }
+    else if(sk.type==='drain'){ var dd=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*(0.9+Math.random()*0.2)*tm)); rpgHitEnemy(dd,m.c.color,sk.fx); var hl=Math.max(1,Math.round(dd*0.5)); m.hp=Math.min(m.hpMax,m.hp+hl); floatR(m.x,m.y-30,'+'+hl,'#ff9ec2'); setLog(m.c.name+' の '+sk.name+'！　'+dd+' ダメージ／HP '+hl+' きゅうしゅう！'+effTxt()); effFloat(); }
+    else if(sk.type==='poison'){ var dp=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*0.6*tm)); rpgHitEnemy(dp,m.c.color,sk.fx); en.poison={t:4,d:Math.max(3,Math.round(m.atk*0.55))}; floatR(en.x,en.y-en.r*0.6,'どく!','#9dff6a'); setLog(m.c.name+' の '+sk.name+'！　'+dp+' ダメージ！　どく じょうたい！'); }
+    else if(sk.type==='stun'){ var ds=Math.max(1,Math.round((atkVal*sk.pow/100 - en.dfn/2)*(0.9+Math.random()*0.2)*tm)); rpgHitEnemy(ds,m.c.color,sk.fx); lif(ds); if(!en.mid && (!en.boss || Math.random()<0.6)){ en.stun=1; floatR(en.x,en.y-en.r*0.6,'スタン!','#9ad6ff'); setLog(m.c.name+' の '+sk.name+'！　'+ds+' ダメージ！　てきは しびれた！'); } else { setLog(m.c.name+' の '+sk.name+'！　'+ds+' ダメージ！（つよi てきには きかない…）'); } }
+    else if(sk.type==='revive'){ var dead=R.active.filter(function(t){return t.hp<=0;}); if(dead.length){ var tg=dead[0]; tg.hp=Math.max(1,Math.round(tg.hpMax*sk.pow/100)); tg.hitFx=0.2; rpgFx('light',m.c.color,tg.x,tg.y); floatR(tg.x,tg.y-30,'いきかえった!','#ffe36b'); SFX.lvup(); setLog(m.c.name+' の '+sk.name+'！　'+tg.c.name+' が いきかえった！'); } else { setLog(m.c.name+' の '+sk.name+'！　でも たおれた なかまは いない'); } }
+    else if(sk.type==='bufflife'){ R.buffLife=4; rpgFx('heart',m.c.color,W/2,H*0.6); setLog(m.c.name+' の '+sk.name+'！　こうげきで HPかいふく（4ターン）！'); }
+    else if(sk.type==='regen'){ R.buffRegen=4; R.regenAmt=Math.round(m.lv*2+12); rpgFx('light',m.c.color,W/2,H*0.6); setLog(m.c.name+' の '+sk.name+'！　まいターン かいふく（4ターン）！'); }
     else if(sk.type==='heal'){ var tgt=lowestAlly(); var amt=Math.round((m.lv*3+18)*sk.pow/100); tgt.hp=Math.min(tgt.hpMax,tgt.hp+amt); rpgFx('light',m.c.color,tgt.x,tgt.y); floatR(tgt.x,tgt.y-30,'+'+amt,'#7dff9a'); setLog(m.c.name+' の '+sk.name+'！　'+tgt.c.name+' HP かいふく！'); }
     else if(sk.type==='healall'){ var amt2=Math.round((m.lv*3+14)*sk.pow/100); R.active.forEach(function(t){ if(t.hp>0){ t.hp=Math.min(t.hpMax,t.hp+amt2); floatR(t.x,t.y-30,'+'+amt2,'#7dff9a'); } }); rpgFx('cheer',m.c.color,W/2,H*0.55); setLog(m.c.name+' の '+sk.name+'！　みんな かいふく！'); }
     else if(sk.type==='buffatk'){ R.buffAtk=4; rpgFx('cheer','#ffd36b',W/2,H*0.55); setLog(m.c.name+' の '+sk.name+'！　みんな こうげきUP！'); }
     else if(sk.type==='buffdef'){ R.buffDef=4; rpgFx('light','#7fd3ff',W/2,H*0.55); setLog(m.c.name+' の '+sk.name+'！　みんな ぼうぎょUP！'); }
   }
   function rpgHitEnemy(dmg,color,fx){ var en=R.enemy; en.hp-=dmg; en.flash=0.14; en.flinch=8; R.shake=Math.min(R.shake+5,14); R.hitFlash=0.05; rpgFx(fx,color,en.x,en.y); floatR(en.x+(Math.random()-0.5)*en.r,en.y,String(dmg),'#fff'); rpgBurst(en.x,en.y,color); if(SFX[fx])SFX[fx](); if(en.hp<=0){ en.hp=0; en.dead=true; en.dieT=0; SFX.kill(); R.shake=16; } }
-  function enemyAct(){ var en=R.enemy; var sk=en.skills[Math.floor(Math.random()*en.skills.length)]; en.flinch=-6; // lunge
-    if(sk.type==='atkall'){ setLog(en.name+' の '+sk.name+'！'); R.active.forEach(function(t){ if(t.hp>0) hurtAlly(t, en.atk*sk.pow/100); }); rpgFx('rainbow', en.col, W/2, H*0.5); }
-    else { var alive=R.active.filter(function(t){return t.hp>0;}); if(!alive.length) return; var t=alive[Math.floor(Math.random()*alive.length)]; setLog(en.name+' の '+sk.name+'！'); hurtAlly(t, en.atk*sk.pow/100); rpgFx('slash', en.col, t.x, t.y); }
+  function enemyAct(){ var en=R.enemy; if(en.stun>0){ en.stun--; setLog(en.name+' は しびれて うごけない！'); floatR(en.x,en.y-en.r*0.6,'スタン!','#9ad6ff'); return; }
+    var sk=en.skills[Math.floor(Math.random()*en.skills.length)]; en.flinch=-6; // lunge
+    if(sk.type==='atkall'){ setLog(en.name+' の '+sk.name+'！'); R.active.forEach(function(t){ if(t.hp>0) hurtAlly(t, en.atk*sk.pow/100, en.type); }); rpgFx('rainbow', en.col, W/2, H*0.5); }
+    else { var alive=R.active.filter(function(t){return t.hp>0;}); if(!alive.length) return; var t=alive[Math.floor(Math.random()*alive.length)]; setLog(en.name+' の '+sk.name+'！'); hurtAlly(t, en.atk*sk.pow/100, en.type); rpgFx('slash', en.col, t.x, t.y); }
     if(SFX.hurt)SFX.hurt(); R.shake=12; }
-  function hurtAlly(t, raw){ var dmg=Math.max(1, Math.round(raw - t.def/2) * (t.guard?0.5:1) * (R.buffDef>0?0.7:1) * (0.9+Math.random()*0.2)); dmg=Math.max(1,Math.round(dmg)); t.hp=Math.max(0,t.hp-dmg); t.hitFx=0.2; floatR(t.x,t.y-20,String(dmg),'#ff7a90'); rpgBurst(t.x,t.y,'#ff7a90'); }
+  function hurtAlly(t, raw, atkType){ var tm=atkType?typeMult(atkType,t.c.type):1; var base=(raw - t.def/2)*tm*(t.guard?0.5:1)*(R.buffDef>0?0.7:1)*(0.9+Math.random()*0.2); var dmg=Math.max(1,Math.round(base)); t.hp=Math.max(0,t.hp-dmg); t.hitFx=0.2; floatR(t.x,t.y-20,String(dmg),'#ff7a90'); if(tm>1)floatR(t.x,t.y-36,'ばつぐん!','#ff8f5a'); rpgBurst(t.x,t.y,'#ff7a90'); }
   function lowestAlly(){ var best=null; R.active.forEach(function(m){ if(m.hp>0 && (!best || m.hp/m.hpMax<best.hp/best.hpMax)) best=m; }); return best||R.active[0]; }
   function checkEnd(){ if(R.enemy.hp<=0){ if(R.sub!=='result'){ R.sub='result'; R.timer=1.0; } return true; } if(R.active.every(function(m){return m.hp<=0;})){ R.sub='dead'; R.timer=0.8; return true; } return false; }
 
@@ -631,6 +707,7 @@
   function battleWon(){ var en=R.enemy; var msgs=[];
     // shared EXP only for the ally who fought (active party) -> common store
     R.active.forEach(function(m){ msgs=msgs.concat(grantExp(m.c.key, en.exp)); syncMember(m); m.hp=m.hpMax; m.mp=m.mpMax; });
+    var leveled=msgs.some(function(s){ return /Lv\d/.test(s); }); if(leveled){ setTimeout(function(){ SFX.lvup(); }, 500); }
     var wasNew=!R.beaten[en.no]; R.beaten[en.no]=1; R.progress=Object.keys(R.beaten).length; saveQuest();
     SAVE.bestRpgLv=Math.max(SAVE.bestRpgLv, CHARS.reduce(function(a,c){return Math.max(a,cget(c.key).lv);},1)); persist();
     if(wasNew && (R.progress%10===0 || R.progress>=QMAX)){ record('rpg',''+R.progress+'体 げきは',''); }
@@ -639,7 +716,7 @@
     showStory(head.concat(msgs), function(){ showHub(); }); }
   function rpgLoseBattle(){ R.sub='hub'; showHub(); }
   function rpgRetryBattle(){ showHub(); }
-  function rpgWinFinal(){ MODE='menu'; LASTMODE='rpg'; storyEl.hidden=true; rpgUI.hidden=true; hubScreen.hidden=true; document.getElementById('winTitle').textContent='ぜんぶ クリア！'; document.getElementById('winMsg').textContent='ラスボス BLACK を たおし、せかいに ひかりが もどった！'; document.getElementById('winStats').innerHTML=R.party.map(function(m){ return m.c.name+' Lv'+m.lv; }).join('　'); winScreen.hidden=false; SFX.boss(); }
+  function rpgWinFinal(){ MODE='menu'; LASTMODE='rpg'; BGM.stop(); storyEl.hidden=true; rpgUI.hidden=true; hubScreen.hidden=true; document.getElementById('winTitle').textContent='ぜんぶ クリア！'; document.getElementById('winMsg').textContent='ラスボス BLACK を たおし、せかいに ひかりが もどった！'; document.getElementById('winStats').innerHTML=R.party.map(function(m){ return m.c.name+' Lv'+m.lv; }).join('　'); winScreen.hidden=false; SFX.boss(); }
 
   // RPG input on canvas for enemy? none. Story handled by storyEl click.
   function rpgUpdate(dt){
@@ -665,11 +742,17 @@
   function drawHeartShape(x,y,s,col){ ctx.save(); ctx.translate(x,y); ctx.fillStyle=col; ctx.shadowColor='#ffb0d8'; ctx.shadowBlur=18; ctx.beginPath(); ctx.moveTo(0,s*0.35); ctx.bezierCurveTo(-s*1.1,-s*0.7,-s*0.5,-s*1.3,0,-s*0.4); ctx.bezierCurveTo(s*0.5,-s*1.3,s*1.1,-s*0.7,0,s*0.35); ctx.closePath(); ctx.fill(); ctx.restore(); }
   function drawParticles(list){ for(var i=0;i<list.length;i++){ var p=list[i], a=1-p.age/p.life; ctx.globalAlpha=a; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); } ctx.globalAlpha=1; }
   function drawFloaters(list){ ctx.textAlign='center'; for(var i=0;i<list.length;i++){ var f=list[i], a=1-f.age/f.life; ctx.globalAlpha=a; var isN=/^[0-9]/.test(f.text); ctx.font=(f.big&&!isN?"18px 'Mochiy Pop One',sans-serif":(isN?"bold 24px 'M PLUS Rounded 1c',sans-serif":"800 15px 'M PLUS Rounded 1c',sans-serif")); ctx.lineWidth=5; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(f.text,f.x,f.y); ctx.fillStyle=f.color; ctx.fillText(f.text,f.x,f.y); } ctx.globalAlpha=1; }
-  function bgScene(boss){ var g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#2a1350'); g.addColorStop(0.45,'#1a0e38'); g.addColorStop(1,'#0c0819'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    var mg=ctx.createRadialGradient(W*0.8,H*0.13,4,W*0.8,H*0.13,W*0.28); mg.addColorStop(0, boss?'rgba(255,60,60,.6)':'rgba(120,140,255,.4)'); mg.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(W*0.8,H*0.13,W*0.28,0,7); ctx.fill();
-    ctx.fillStyle=boss?'#c73b4a':'#8aa0d8'; ctx.beginPath(); ctx.arc(W*0.8,H*0.13,W*0.10,0,7); ctx.fill();
+  var BGPAL={ norm:{ top:'#2a1350', mid:'#1a0e38', bot:'#0c0819', moon:'rgba(120,140,255,.4)', moonC:'#8aa0d8', line:'rgba(154,214,255,0.18)' },
+    boss:{ top:'#3a1030', mid:'#25082a', bot:'#0c0512', moon:'rgba(255,80,80,.5)', moonC:'#c73b4a', line:'rgba(255,140,150,0.18)' },
+    mid:{ top:'#4a0a16', mid:'#2a0410', bot:'#0a0206', moon:'rgba(255,50,40,.65)', moonC:'#e83030', line:'rgba(255,90,80,0.26)' },
+    black:{ top:'#2a0a3a', mid:'#160522', bot:'#050208', moon:'rgba(200,20,90,.6)', moonC:'#c0104a', line:'rgba(200,90,255,0.22)' } };
+  function bgScene(tier){ if(tier===true)tier='boss'; if(!tier)tier='norm'; var p=BGPAL[tier]||BGPAL.norm;
+    var g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,p.top); g.addColorStop(0.45,p.mid); g.addColorStop(1,p.bot); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    var mg=ctx.createRadialGradient(W*0.8,H*0.13,4,W*0.8,H*0.13,W*0.28); mg.addColorStop(0,p.moon); mg.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(W*0.8,H*0.13,W*0.28,0,7); ctx.fill();
+    ctx.fillStyle=p.moonC; ctx.beginPath(); ctx.arc(W*0.8,H*0.13,W*0.10,0,7); ctx.fill();
+    if(tier==='mid'||tier==='black'){ ctx.save(); ctx.globalAlpha=0.10+0.06*Math.sin((MODE==='rpg'?rpgTime:G.time)*3); var vg=ctx.createRadialGradient(W/2,H*0.5,W*0.2,W/2,H*0.5,W*0.75); vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,(tier==='mid'?'rgba(255,20,20,':'rgba(160,10,120,')+'0.9)'); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H); ctx.restore(); }
     for(var i=0;i<36;i++){ var x=(i*97%W), y=(i*53%(H*0.5)); ctx.globalAlpha=(0.4+0.6*Math.abs(Math.sin((MODE==='rpg'?rpgTime:G.time)*2+i)))*0.6; ctx.fillStyle='#fff'; ctx.fillRect(x,y,1.6,1.6); } ctx.globalAlpha=1;
-    ctx.strokeStyle='rgba(154,214,255,0.18)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,H*0.56); ctx.lineTo(W,H*0.56); ctx.stroke(); }
+    ctx.strokeStyle=p.line; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,H*0.56); ctx.lineTo(W,H*0.56); ctx.stroke(); }
   function drawMonster(art,R2,flash,alpha,col){ col=col||'#5bd66a'; ctx.globalAlpha=alpha;
     var _mi=MONIMG[art];
     if(_mi&&_mi.complete&&_mi.naturalWidth>0){ ctx.save(); ctx.globalAlpha=alpha; ctx.beginPath(); ctx.arc(0,0,R2*1.16,0,7); ctx.clip(); var S=R2*2.75; ctx.drawImage(_mi,-S/2,-S/2-R2*0.05,S,S); if(flash>0){ ctx.globalAlpha=(flash/0.14)*0.6; ctx.fillStyle='#fff'; ctx.fillRect(-S,-S,2*S,2*S); } ctx.restore(); ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=R2*0.04; ctx.beginPath(); ctx.arc(0,0,R2*1.16,0,7); ctx.stroke(); ctx.globalAlpha=1; return; }
@@ -733,11 +816,14 @@
   // ---------- RPG render ----------
   function drawRpgEnemy(){ var en=R.enemy; if(!en) return; var R2=en.r, bob=Math.sin(en.bob*1.7)*6, cx=en.x, cy=en.y+bob-Math.max(0,en.flinch)*0.5 + Math.min(0,en.flinch)*0.8; var scale=1,alpha=1,drop=0;
     if(en.dead){ var t=Math.min(en.dieT/1.2,1); scale=1-t*0.5; alpha=1-Math.max(0,(t-0.4)/0.6); drop=t*t*H*0.1; }
-    ctx.save(); ctx.globalAlpha=alpha*0.22; ctx.fillStyle='#000'; ctx.beginPath(); ctx.ellipse(cx,cy+R2*1.1+drop,R2*0.9,R2*0.26,0,0,7); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.globalAlpha=alpha*0.26; ctx.fillStyle='#000'; ctx.beginPath(); ctx.ellipse(cx,cy+R2*1.32+drop,R2*0.85,R2*0.2,0,0,7); ctx.fill(); ctx.restore();
     ctx.save(); ctx.translate(cx,cy+drop); ctx.scale(scale,scale);
     if(en.boss){ var pl=0.5+0.5*Math.sin(rpgTime*7); ctx.save(); ctx.globalAlpha=alpha*(0.28+0.2*pl); var ag=ctx.createRadialGradient(0,0,R2*0.5,0,0,R2*2); ag.addColorStop(0,'rgba(200,40,90,.5)'); ag.addColorStop(1,'rgba(200,40,90,0)'); ctx.fillStyle=ag; ctx.beginPath(); ctx.arc(0,0,R2*2,0,7); ctx.fill(); ctx.restore(); }
     var eimg=enemyImg(en);
-    if(eimg){ var S=R2*2.5, x=-S/2, y=-S/2; ctx.save(); ctx.globalAlpha=alpha; roundClip(x,y,S,S,S*0.12); ctx.clip(); ctx.drawImage(eimg,x,y,S,S); if(en.flash>0){ ctx.globalAlpha=(en.flash/0.14)*0.6; ctx.fillStyle='#fff'; ctx.fillRect(x,y,S,S); } ctx.restore(); ctx.lineWidth=R2*0.06; ctx.strokeStyle=en.boss?'#ff4d5e':'rgba(255,255,255,.5)'; roundClip(x,y,S,S,S*0.12); ctx.stroke(); }
+    if(eimg){ var S=Math.round(R2*2.9); _sbuf.width=S; _sbuf.height=S; _sctx.clearRect(0,0,S,S); _sctx.globalCompositeOperation='source-over'; _sctx.globalAlpha=1; _sctx.drawImage(eimg,0,0,S,S);
+      if(en.flash>0){ _sctx.globalCompositeOperation='source-atop'; _sctx.globalAlpha=(en.flash/0.14)*0.6; _sctx.fillStyle='#fff'; _sctx.fillRect(0,0,S,S); _sctx.globalAlpha=1; }
+      _sctx.globalCompositeOperation='destination-in'; var rg=_sctx.createRadialGradient(S/2,S*0.46,S*0.12, S/2,S*0.47,S*0.53); rg.addColorStop(0,'rgba(0,0,0,1)'); rg.addColorStop(0.68,'rgba(0,0,0,1)'); rg.addColorStop(1,'rgba(0,0,0,0)'); _sctx.fillStyle=rg; _sctx.fillRect(0,0,S,S); _sctx.globalCompositeOperation='source-over';
+      ctx.save(); ctx.globalAlpha=alpha; ctx.drawImage(_sbuf, -S/2, -S/2, S, S); ctx.restore(); }
     else if(en.art==='black'){ drawBlackFace(0,0,R2,en.flash,alpha,en.wing); }
     else { drawMonster(en.art,R2,en.flash,alpha,en.col); }
     ctx.restore();
@@ -754,7 +840,7 @@
     var gx=m.x-w*0.42,gw=w*0.84; var hy=py+14; roundClip(gx,hy,gw,5,2.5); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill(); roundClip(gx,hy,gw*Math.max(0,m.hp/m.hpMax),5,2.5); ctx.fillStyle=m.hp/m.hpMax<0.3?'#ff5a5a':'#5be07a'; ctx.fill();
     var my=hy+7; roundClip(gx,my,gw,4,2); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill(); roundClip(gx,my,gw*Math.max(0,m.mp/m.mpMax),4,2); ctx.fillStyle='#5aa0ff'; ctx.fill();
     ctx.restore(); }
-  function renderRpg(){ var sx=0,sy=0; if(R.shake>0&&!reduceMotion){ sx=(Math.random()-0.5)*R.shake; sy=(Math.random()-0.5)*R.shake; } ctx.save(); ctx.translate(sx,sy); bgScene(R.enemy&&R.enemy.boss);
+  function renderRpg(){ var sx=0,sy=0; if(R.shake>0&&!reduceMotion){ sx=(Math.random()-0.5)*R.shake; sy=(Math.random()-0.5)*R.shake; } ctx.save(); ctx.translate(sx,sy); bgScene(R.enemy?R.enemy.tier:'norm');
     if(R.enemy){ drawRpgEnemy(); drawEffectList(R.effects, R.enemy?R.enemy.r:40); R.active.forEach(function(m,i){ drawRpgAlly(m, R.sub==='input'&&i===R.curAlly); }); drawParticles(R.particles); drawFloaters(R.floaters); }
     if(R.hitFlash>0){ ctx.globalAlpha=R.hitFlash/0.05*0.3; ctx.fillStyle='#fff'; ctx.fillRect(-40,-40,W+80,H+80); ctx.globalAlpha=1; } ctx.restore(); }
 
