@@ -116,6 +116,8 @@
   .ecell.beaten{ opacity:.9; }
   .ecell.beaten .et,.ecell.beaten .eblack{ filter:grayscale(.95) brightness(.5); }
   .ecell.beaten .en2{ color:#9a90a5; }
+  .ecell .etype{ position:absolute; top:3px; left:3px; z-index:2; font-family:var(--pop); font-size:8.5px; font-weight:800; color:#1a1020; padding:1px 6px; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,.5); }
+  .ecell.beaten .etype{ opacity:.55; }
   .ecell.beaten::after{ content:'討伐'; position:absolute; top:6px; left:4px; right:4px; aspect-ratio:1/1; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(10,4,8,.32); color:#ff3b30; font-family:var(--pop); font-weight:800; font-size:19px; letter-spacing:3px; text-shadow:0 2px 5px rgba(0,0,0,.95); }
   .hubHint{ font-family:var(--pop); font-size:13px; color:#ffd36b; }
   #charStat{ background:rgba(8,5,18,.88); }
@@ -181,6 +183,7 @@
   <div id="helpScreen" class="screen" hidden>
     <div class="title-en" style="font-size:26px">なかまの わざ</div>
     <div style="font-size:12px;color:#c9a6ff;line-height:1.6;max-width:370px">みんな こうげき力は だいたい おなじ。たたかうと <b style="color:#ffd36b">レベルアップ</b> して つよくなる。ゲージが たまると <b style="color:#ffd36b">ひっさつ</b>！</div>
+    <div id="typeChart" style="width:100%;max-width:370px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 12px"></div>
     <div id="helpList" class="helpList"></div>
     <button class="btn" id="helpClose">とじる</button>
   </div>
@@ -318,6 +321,12 @@
     return 1; }
   var ALLYTYPE={ sakutaro:'ken', papa:'ken', haruka:'hono', ryudou:'hono', kapparu:'mizu', yura:'mizu', ayaka:'hikari', hayu:'hikari', kika:'yami', subaru:'yami' };
   CHARS.forEach(function(c){ c.type=ALLYTYPE[c.key]||'ken'; });
+  function typeName(t){ return (TYPES[t]||{}).name||''; }
+  function typePill(t){ var T=TYPES[t]; if(!T) return ''; return '<span style="display:inline-block;padding:1px 10px;border-radius:10px;font-size:11px;font-weight:800;color:#1a1020;background:'+T.col+'">'+T.name+'タイプ</span>'; }
+  // canvas: draw a small type chip. returns width. align: 'left'(default)|'right'|'center'(x=center)
+  function drawTypeChip(g,x,y,t,align){ var T=TYPES[t]; if(!T) return 0; g.save(); g.font="800 10px 'M PLUS Rounded 1c',sans-serif"; var w=g.measureText(T.name).width+13, h=14; var bx=x; if(align==='right')bx=x-w; else if(align==='center')bx=x-w/2;
+    g.beginPath(); var r=h/2; g.moveTo(bx+r,y); g.arcTo(bx+w,y,bx+w,y+h,r); g.arcTo(bx+w,y+h,bx,y+h,r); g.arcTo(bx,y+h,bx,y,r); g.arcTo(bx,y,bx+w,y,r); g.closePath(); g.fillStyle=T.col; g.fill();
+    g.fillStyle='#1a1020'; g.textAlign='center'; g.textBaseline='alphabetic'; g.fillText(T.name,bx+w/2,y+10); g.restore(); return w; }
 
   // ===== shared character progression（共通レベル：アクション/RPG 両モードで共有・永続） =====
   var CSKEY='sd_chars_v1';
@@ -482,6 +491,7 @@
     el.innerHTML='<div class="statCard">'
       +'<canvas id="statCv" width="200" height="220"></canvas>'
       +'<div class="statName" style="color:'+c.color+'">'+c.name+'</div>'
+      +'<div style="margin:3px 0 1px">'+typePill(c.type)+'</div>'
       +'<div class="statRole">'+(c.ability||'')+'</div>'
       +'<div class="statLv">Lv '+st.lv+(st.lv<100?'　つぎまで '+Math.max(0,nextExp(st.lv)-st.exp)+' けいけん':'　（さいだいレベル）')+'</div>'
       +'<div class="statGrid">'+row('HP',s.hpMax)+row('MP',s.mpMax)+row('こうげき',s.atk)+row('ぼうぎょ',s.def)+row('すばやさ',s.spd)+row('おぼえた',st.learned.length+'／'+c.learn.length)+'</div>'
@@ -512,7 +522,12 @@
   document.getElementById('loseRetry').addEventListener('click',function(){ if(LASTMODE==='action') startGame(); else rpgRetryBattle(); });
   document.getElementById('winTop').addEventListener('click',toTop);
   document.getElementById('loseTop').addEventListener('click',toTop);
-  document.getElementById('helpBtn').addEventListener('click',function(){ var helpList=document.getElementById('helpList'); if(!helpList.childElementCount){ CHARS.forEach(function(c){ var row=document.createElement('div'); row.className='helpRow'; row.style.setProperty('--bc',c.color); row.innerHTML='<div class="ha"></div><div class="ht"><b>'+c.name+'</b><span class="hs">'+c.skill+'</span><small>'+c.ability+'</small></div>'; faceStyle(row.querySelector('.ha'),c.key); helpList.appendChild(row); }); } helpScreen.hidden=false; });
+  document.getElementById('helpBtn').addEventListener('click',function(){ var helpList=document.getElementById('helpList');
+    var tc=document.getElementById('typeChart'); if(tc && !tc.childElementCount){ var order=TYPECYCLE.map(typePill).join(' <span style="color:#ffd36b">▶</span> ');
+      tc.innerHTML='<div style="font-family:var(--pop);font-size:13px;color:#ffd36b;margin-bottom:4px;text-align:center">タイプの あいしょう</div>'
+        +'<div style="font-size:11px;color:#c9a6ff;line-height:1.6;margin-bottom:7px;text-align:center">やじるしの さきに <b style="color:#7fe0a0">つよい</b>！（こうかバツグン＝1.6ばい／ぎゃくは いまひとつ）</div>'
+        +'<div style="display:flex;flex-wrap:wrap;gap:4px 3px;align-items:center;justify-content:center">'+order+' <span style="color:#8a80a5;font-size:10px">…けんに もどる</span></div>'; }
+    if(!helpList.childElementCount){ CHARS.forEach(function(c){ var row=document.createElement('div'); row.className='helpRow'; row.style.setProperty('--bc',c.color); row.innerHTML='<div class="ha"></div><div class="ht"><b>'+c.name+'</b> '+typePill(c.type)+'<span class="hs">'+c.skill+'</span><small>'+c.ability+'</small></div>'; faceStyle(row.querySelector('.ha'),c.key); helpList.appendChild(row); }); } helpScreen.hidden=false; });
   document.getElementById('helpClose').addEventListener('click',function(){ helpScreen.hidden=true; });
 
   // ========================================================= ACTION MODE =========================================================
@@ -623,7 +638,8 @@
     var beat=R.progress, all=(beat>=QMAX);
     var cells=ENEMIES.map(function(en,idx){ var no=('00'+en.no).slice(-3); var done=R.beaten[en.no]?' beaten':''; var boss=en.boss?' boss':'';
       var thumb=en.black ? '<div class="eblack">BLACK</div>' : '<img class="et" loading="lazy" src="'+enemyThumbUrl(en)+'" alt="">';
-      return '<div class="ecell'+boss+done+'" data-i="'+idx+'">'+thumb+'<div class="eno">No.'+no+'</div><div class="en2">'+(en.boss?'★ ':'')+en.name+'</div></div>'; }).join('');
+      var T=TYPES[en.type]||{col:'#888',name:''}; var tag='<div class="etype" style="background:'+T.col+'">'+T.name+'</div>';
+      return '<div class="ecell'+boss+done+'" data-i="'+idx+'">'+tag+thumb+'<div class="eno">No.'+no+'</div><div class="en2">'+(en.boss?'★ ':'')+en.name+'</div></div>'; }).join('');
     hubScreen.innerHTML='<div class="title-en" style="font-size:24px">ぼうけん</div>'+
       '<div class="hubHint">たたかう あいてを えらんでね</div>'+
       '<div class="hubProg">たおした '+beat+' ／ '+QMAX+(all?'　ぜんぶ クリア！':'')+'<div class="hubbar"><div style="width:'+(beat/QMAX*100)+'%"></div></div></div>'+
@@ -847,7 +863,7 @@
     else if(en.art==='black'){ drawBlackFace(0,0,R2,en.flash,alpha,en.wing); }
     else { drawMonster(en.art,R2,en.flash,alpha,en.col); }
     ctx.restore();
-    var pad=14,bx=pad,by=pad+18,bw=W-pad*2,bh=12; ctx.textAlign='left'; ctx.font="800 14px 'M PLUS Rounded 1c',sans-serif"; ctx.fillStyle=en.boss?'#ff7a90':'#cfe0ff'; ctx.fillText((en.boss?'★ ':'')+en.name, pad,pad+12);
+    var pad=14,bx=pad,by=pad+18,bw=W-pad*2,bh=12; ctx.textAlign='left'; ctx.font="800 14px 'M PLUS Rounded 1c',sans-serif"; ctx.fillStyle=en.boss?'#ff7a90':'#cfe0ff'; var enm=(en.boss?'★ ':'')+en.name; ctx.fillText(enm, pad,pad+12); if(en.type) drawTypeChip(ctx, pad+ctx.measureText(enm).width+8, pad+1, en.type, 'left');
     roundClip(bx,by,bw,bh,6); ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fill(); var hf=Math.max(0,en.hp/en.hpMax); if(hf>0){ roundClip(bx,by,Math.max(bh,bw*hf),bh,6); var hg=ctx.createLinearGradient(bx,0,bx+bw,0); hg.addColorStop(0,'#ff2a4a'); hg.addColorStop(1,'#ff9a4a'); ctx.fillStyle=hg; ctx.fill(); } ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=2; roundClip(bx,by,bw,bh,6); ctx.stroke(); }
   function drawRpgAlly(m,isCur){ var w=m.w,h=m.h; var pop=m.hitFx>0?-Math.sin((0.25-m.hitFx)/0.25*Math.PI)*6:0; var dead=m.hp<=0; var groundY=m.y+h/2; var cy=groundY+pop; var im=standImg(m.c.key);
     ctx.save(); ctx.textAlign='center';
@@ -856,7 +872,10 @@
     if(im){ drawStandee(ctx, im, m.x, cy, boxW, boxH, { alpha:dead?0.34:1, tint: dead?'#101018':null, tintA:0.55, flash: m.hitFx>0?(m.hitFx/0.25)*0.5:0 }); }
     else { ctx.globalAlpha=dead?0.2:0.25; ctx.fillStyle='#000'; ctx.beginPath(); ctx.ellipse(m.x,groundY-4,w*0.38,6,0,0,7); ctx.fill(); ctx.globalAlpha=1; ctx.fillStyle=m.c.color; roundClip(m.x-w*0.3,cy-h*1.35,w*0.6,h*1.35,10); ctx.fill(); }
     // info panel below the feet: name+Lv, HP, MP
-    var py=groundY+5; ctx.font="800 11px 'M PLUS Rounded 1c',sans-serif"; ctx.fillStyle=isCur?'#ffd36b':(dead?'#8a8095':'#fff'); ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=3; ctx.strokeText(m.c.name+' Lv'+m.lv,m.x,py+9); ctx.fillText(m.c.name+' Lv'+m.lv,m.x,py+9);
+    var py=groundY+5; ctx.font="800 11px 'M PLUS Rounded 1c',sans-serif"; ctx.strokeStyle='rgba(0,0,0,.7)'; ctx.lineWidth=3; ctx.textAlign='left';
+    var tn=typeName(m.c.type), nm=m.c.name+' Lv'+m.lv, gap=(tn?4:0); var tw=tn?ctx.measureText(tn).width:0, nw=ctx.measureText(nm).width; var sx=m.x-(tw+gap+nw)/2;
+    if(tn){ ctx.strokeText(tn,sx,py+9); ctx.fillStyle=(TYPES[m.c.type]||{}).col||'#fff'; ctx.fillText(tn,sx,py+9); }
+    ctx.strokeText(nm,sx+tw+gap,py+9); ctx.fillStyle=isCur?'#ffd36b':(dead?'#8a8095':'#fff'); ctx.fillText(nm,sx+tw+gap,py+9); ctx.textAlign='center';
     var gx=m.x-w*0.42,gw=w*0.84; var hy=py+14; roundClip(gx,hy,gw,5,2.5); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill(); roundClip(gx,hy,gw*Math.max(0,m.hp/m.hpMax),5,2.5); ctx.fillStyle=m.hp/m.hpMax<0.3?'#ff5a5a':'#5be07a'; ctx.fill();
     var my=hy+7; roundClip(gx,my,gw,4,2); ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fill(); roundClip(gx,my,gw*Math.max(0,m.mp/m.mpMax),4,2); ctx.fillStyle='#5aa0ff'; ctx.fill();
     ctx.restore(); }
