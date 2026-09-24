@@ -51,6 +51,7 @@
   .modeCard .mt small{ font-size:11.5px; color:#c9a6ff; line-height:1.5; display:block; margin-top:3px; }
   .modeCard.action{ border-color:#ff9a5a; box-shadow:0 6px 18px rgba(255,120,46,.18); }
   .modeCard.rpg{ border-color:#7fb0ff; box-shadow:0 6px 18px rgba(80,140,255,.18); }
+  .modeCard.gate{ border-color:#66e0a0; box-shadow:0 6px 18px rgba(60,220,150,.18); }
 
   #helpScreen{ background:radial-gradient(130% 90% at 50% 0%, #2a1650, #1a0e34 55%, #0c0819); }
   .helpList{ display:flex; flex-direction:column; gap:6px; width:100%; max-width:400px; }
@@ -177,6 +178,8 @@
       <div class="mt"><b>アクションバトル</b><small>3人で 10連戦！たおすと <b style="color:#ffd36b">賞品＋コイン</b> ゲット。むずかしいよ。（レベルは あがらない）</small></div></div>
     <div class="modeCard rpg" id="modeRpg"><div class="mi">📖</div>
       <div class="mt"><b>ぼうけん（100体クエスト）</b><small>1戦ずつ てきを たおして レベルアップ。ぜんぶで100体。10人から 出撃を えらび、つづきから あそべる。</small></div></div>
+    <div class="modeCard gate" id="modeGate"><div class="mi">🚩</div>
+      <div class="mt"><b>ゲートラン</b><small>ゆびを 左右に うごかして いい ゲートを えらび、なかまを ふやそう！ さいごの ボスを たおすと <span style="color:#ffd36b;font-weight:800">コイン＋お宝</span> が もらえるよ。</small></div></div>
     <div class="modeCard" id="shopEntry" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px"><div class="mi">🏪</div><div class="mt"><b>おじいさんの ショップ</b><small>コインで どうぐを かう／賞品を うる</small></div></div><div style="text-align:right;padding-right:6px"><div style="font-family:var(--pop);font-size:16px;color:#ffd36b" id="coinTop">🪙 0</div></div></div>
     <div id="charLv" style="width:100%;max-width:430px"></div>
     <button class="btn sub" id="typeChartBtn" style="font-size:13px;padding:8px 18px">タイプの あいしょうひょう を みる</button>
@@ -613,8 +616,8 @@
   document.getElementById('modeRpg').addEventListener('click',function(){ actx(); hideAll(); topBtn.hidden=false; rpgStart(); });
 
   document.getElementById('startBtn').addEventListener('click',function(){ var nm=document.getElementById('nameInput').value.trim(); G.playerName=nm?nm.slice(0,6):'ゆうしゃ'; actx(); startGame(); });
-  document.getElementById('winRetry').addEventListener('click',function(){ if(LASTMODE==='action') startGame(); else rpgStart(); });
-  document.getElementById('loseRetry').addEventListener('click',function(){ if(LASTMODE==='action') startGame(); else rpgRetryBattle(); });
+  document.getElementById('winRetry').addEventListener('click',function(){ if(LASTMODE==='gate') grStart(); else if(LASTMODE==='action') startGame(); else rpgStart(); });
+  document.getElementById('loseRetry').addEventListener('click',function(){ if(LASTMODE==='gate') grStart(); else if(LASTMODE==='action') startGame(); else rpgRetryBattle(); });
   document.getElementById('winTop').addEventListener('click',toTop);
   document.getElementById('loseTop').addEventListener('click',toTop);
   document.getElementById('helpBtn').addEventListener('click',function(){ var helpList=document.getElementById('helpList');
@@ -1008,9 +1011,205 @@
   // ---------- main loop ----------
   var rpgTime=0;
   var last=performance.now();
+  /* ============ ゲートラン（汎用の小さな兵隊）============ */
+  var POP="'M PLUS Rounded 1c',sans-serif";
+  var GR={};
+  function grReset(){
+    GR={ phase:'run', t:0, count:6, lane:0.5, targetLane:0.5,
+         gates:[], gatesToBoss:6, spawnT:0, spawnGap:1.35, moved:0,
+         soldiers:[], bullets:[], boss:null, bossBullets:[], hitFlash:0, shake:0,
+         floaters:[], fireT:0, reward:null, endT:0, drag:false };
+    for(var i=0;i<GR.count;i++) GR.soldiers.push(grNewSoldier());
+  }
+  function grNewSoldier(){ return { ox:(Math.random()-0.5), oy:(Math.random()-0.5), ph:Math.random()*6.28, x:0, y:0 }; }
+  function grSyncSoldiers(){ var n=Math.min(GR.count,54);
+    while(GR.soldiers.length<n) GR.soldiers.push(grNewSoldier());
+    if(GR.soldiers.length>n) GR.soldiers.length=n; }
+  function grCrowdY(){ return H-118; }
+  function grRoad(){ var w=Math.min(W*0.86,430); return { x0:W/2-w/2, x1:W/2+w/2, w:w }; }
+  function grLaneX(l){ var r=grRoad(); return r.x0 + r.w*(0.16+0.68*l); }
+  function grCrowdCX(){ var r=grRoad(); var m=Math.min(r.w*0.30,86); return Math.max(r.x0+m, Math.min(r.x1-m, grLaneX(GR.lane))); }
+  function grSpawnGate(){
+    var r=grRoad();
+    // operator pools; bias toward a clearly-good option but sometimes a trap
+    var goods=[['×',2],['×',2],['×',3],['+',8],['+',12],['+',15],['+',20]];
+    var bads=[['-',6],['-',10],['-',14],['÷',2],['+',3],['+',5]];
+    var la,lb;
+    if(Math.random()<0.72){ la=goods[Math.floor(Math.random()*goods.length)]; lb=bads[Math.floor(Math.random()*bads.length)]; }
+    else { la=goods[Math.floor(Math.random()*goods.length)]; lb=goods[Math.floor(Math.random()*goods.length)]; }
+    if(Math.random()<0.5){ var tmp=la; la=lb; lb=tmp; }
+    GR.gates.push({ y:-46, aType:la[0], aVal:la[1], bType:lb[0], bVal:lb[1], done:false });
+  }
+  function grApplyOp(op,val){ var c=GR.count;
+    if(op==='×') c=c*val; else if(op==='+') c=c+val; else if(op==='-') c=c-val; else if(op==='÷') c=Math.floor(c/val);
+    GR.count=Math.max(0,Math.min(300,Math.round(c))); }
+  function grStart(){ LASTMODE='gate'; MODE='gate'; hideAll(); topBtn.hidden=false; SAVE.plays++; persist(); actx(); grReset(); BGM.play('normal'); }
+  function grFloat(x,y,text,color){ GR.floaters.push({ x:x,y:y,vy:-46,age:0,life:1.1,text:text,color:color||'#fff' }); }
+
+  function grUpdate(dt){
+    GR.t+=dt; if(GR.hitFlash>0)GR.hitFlash-=dt; if(GR.shake>0)GR.shake=Math.max(0,GR.shake-dt*60);
+    // steer crowd toward target lane
+    GR.lane += (GR.targetLane-GR.lane)*Math.min(1,dt*9);
+    // floaters
+    for(var f=GR.floaters.length-1;f>=0;f--){ var fl=GR.floaters[f]; fl.age+=dt; fl.y+=fl.vy*dt; fl.vy+=60*dt; if(fl.age>=fl.life)GR.floaters.splice(f,1); }
+    grSyncSoldiers();
+    var speed=178;
+    if(GR.phase==='run'){
+      GR.moved+=speed*dt;
+      GR.spawnT+=dt;
+      if(GR.spawnT>=GR.spawnGap && GR.gatesToBoss>0){ GR.spawnT=0; GR.gatesToBoss--; grSpawnGate(); }
+      var cy=grCrowdY();
+      for(var i=GR.gates.length-1;i>=0;i--){ var g=GR.gates[i]; g.y+=speed*dt;
+        if(!g.done && g.y>=cy){ g.done=true; var left=GR.lane<0.5;
+          var op=left?g.aType:g.bType, val=left?g.aVal:g.bVal, before=GR.count; grApplyOp(op,val);
+          var d=GR.count-before, col=d>=0?'#7dff9a':'#ff7a90'; grFloat(grCrowdCX(),cy-40,(d>=0?'+':'')+d,col);
+          if(d>=0)SFX.rescue(); else { SFX.hurt(); GR.shake=8; }
+          if(GR.count<=0){ grLose(); return; } }
+        if(g.y>H+40) GR.gates.splice(i,1); }
+      // transition to boss when all gates spawned and cleared off crowd
+      if(GR.gatesToBoss<=0 && GR.gates.length===0){ GR.phase='boss';
+        var hp=Math.round(220+GR.count*14);
+        GR.boss={ hp:hp, hpMax:hp, x:W/2, y:-120, ty:H*0.24, in:true, atkT:1.2, bob:0 };
+        grFloat(W/2,H*0.4,'ボス あらわる！','#ff6a7a'); SFX.boss(); BGM.play('mid'); }
+    }
+    // bullets always update
+    GR.fireT+=dt;
+    if((GR.phase==='boss') && GR.fireT>=0.16){ GR.fireT=0;
+      var shooters=Math.min(GR.soldiers.length,10);
+      for(var s=0;s<shooters;s++){ var so=GR.soldiers[s]; GR.bullets.push({ x:so.x, y:so.y-14, vy:-620 }); }
+    }
+    for(var b=GR.bullets.length-1;b>=0;b--){ var bu=GR.bullets[b]; bu.y+=bu.vy*dt;
+      if(GR.boss && !GR.boss.in && bu.y<=GR.boss.y+34 && Math.abs(bu.x-GR.boss.x)<64){ GR.boss.hp-=3; GR.boss.flash=0.06; GR.bullets.splice(b,1); continue; }
+      if(bu.y<-20) GR.bullets.splice(b,1); }
+    if(GR.phase==='boss'){ GR.targetLane += (0.5-GR.targetLane)*Math.min(1,dt*3.5); }
+    if(GR.phase==='boss' && GR.boss){ var bo=GR.boss; bo.bob+=dt;
+      if(bo.in){ bo.y+=(bo.ty-bo.y)*Math.min(1,dt*3); if(Math.abs(bo.y-bo.ty)<2){ bo.y=bo.ty; bo.in=false; } }
+      else {
+        if(bo.flash>0)bo.flash-=dt;
+        bo.atkT-=dt; if(bo.atkT<=0){ bo.atkT=0.9+Math.random()*0.5; var n=3;
+          for(var k=0;k<n;k++) GR.bossBullets.push({ x:bo.x+(Math.random()-0.5)*90, y:bo.y+40, vy:300+Math.random()*90, x0:bo.x }); SFX.warn(); }
+        for(var bb=GR.bossBullets.length-1;bb>=0;bb--){ var pb=GR.bossBullets[bb]; pb.y+=pb.vy*dt;
+          if(pb.y>=grCrowdY()-6 && Math.abs(pb.x-grCrowdCX())<70){ GR.bossBullets.splice(bb,1); GR.count=Math.max(0,GR.count-2); GR.hitFlash=0.12; GR.shake=9; SFX.hurt(); grFloat(grCrowdCX(),grCrowdY()-30,'-2','#ff7a90'); if(GR.count<=0){ grLose(); return; } continue; }
+          if(pb.y>H+30) GR.bossBullets.splice(bb,1); }
+        if(bo.hp<=0){ bo.hp=0; grWin(); return; }
+      }
+    }
+  }
+  function grLayoutSoldiers(){ var cx=grCrowdCX(), cy=grCrowdY(), n=GR.soldiers.length;
+    var cols=Math.min(9,Math.max(3,Math.ceil(Math.sqrt(n*1.4)))), sp=22;
+    for(var i=0;i<n;i++){ var so=GR.soldiers[i]; var row=Math.floor(i/cols), col=i%cols, inrow=Math.min(cols,n-row*cols);
+      var tx=cx+(col-(inrow-1)/2)*sp + so.ox*4, ty=cy - row*17 + so.oy*3;
+      if(!so.init){ so.x=tx; so.y=ty; so.init=true; }
+      else { so.x+=(tx-so.x)*0.25; so.y+=(ty-so.y)*0.25; } } }
+  function grDrawSoldier(g,x,y,sc,run,t){
+    g.save(); g.translate(x,y);
+    var bob=run?Math.sin(t*10)*1.5:0;
+    // shadow
+    g.globalAlpha=0.22; g.fillStyle='#000'; g.beginPath(); g.ellipse(0,2,7*sc,3*sc,0,0,7); g.fill(); g.globalAlpha=1;
+    // body (green uniform)
+    g.fillStyle='#3bbf6e'; g.fillRect(-4*sc,(-14+bob)*sc,8*sc,10*sc);
+    g.fillStyle='#2f9e5a'; g.fillRect(-4*sc,(-6+bob)*sc,8*sc,3*sc);
+    // head
+    g.fillStyle='#f0c8a0'; g.beginPath(); g.arc(0,(-17+bob)*sc,3.4*sc,0,7); g.fill();
+    // helmet
+    g.fillStyle='#2a7f48'; g.beginPath(); g.arc(0,(-18+bob)*sc,3.7*sc,Math.PI,0); g.fill();
+    // gun
+    g.fillStyle='#3a3f4a'; g.fillRect(2*sc,(-13+bob)*sc,7*sc,2*sc);
+    g.restore();
+  }
+  function grRender(){
+    var sh=GR.shake>0?(Math.random()-0.5)*GR.shake:0;
+    ctx.save(); ctx.translate(sh,sh*0.6);
+    // sky/bg
+    var bg=ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0,'#123a2a'); bg.addColorStop(0.5,'#0e2b22'); bg.addColorStop(1,'#0b1a18'); ctx.fillStyle=bg; ctx.fillRect(-20,-20,W+40,H+40);
+    // road
+    var r=grRoad();
+    ctx.fillStyle='#20303a'; ctx.fillRect(r.x0,0,r.w,H);
+    ctx.fillStyle='rgba(255,255,255,.10)'; ctx.fillRect(r.x0-3,0,4,H); ctx.fillRect(r.x1-1,0,4,H);
+    // moving lane dashes
+    var off=(GR.moved%60);
+    ctx.fillStyle='rgba(255,255,255,.14)';
+    for(var y=-60+off;y<H;y+=60){ ctx.fillRect(W/2-3,y,6,30); }
+    // gates
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    GR.gates.forEach(function(g){ if(g.done)return; var mid=W/2;
+      // left half
+      grDrawGateHalf(r.x0,mid,g.y,g.aType,g.aVal);
+      grDrawGateHalf(mid,r.x1,g.y,g.bType,g.bVal);
+      // divider post
+      ctx.fillStyle='#0c1512'; ctx.fillRect(mid-2,g.y-30,4,60);
+    });
+    // boss
+    if(GR.boss){ var bo=GR.boss; var by=bo.y+Math.sin(bo.bob*2)*4;
+      ctx.save(); ctx.translate(bo.x,by);
+      if(bo.flash>0){ ctx.shadowColor='#fff'; ctx.shadowBlur=22; }
+      // big brute
+      ctx.fillStyle='#7a2f8c'; ctx.beginPath(); ctx.ellipse(0,4,10,6,0,0,7); ctx.globalAlpha=0.35; ctx.fillStyle='#000'; ctx.fill(); ctx.globalAlpha=1;
+      ctx.fillStyle='#8a3b5a'; ctx.fillRect(-46,-36,92,64);
+      ctx.fillStyle='#a24a6c'; ctx.fillRect(-46,-36,92,16);
+      ctx.fillStyle='#f0c8a0'; ctx.beginPath(); ctx.arc(0,-52,20,0,7); ctx.fill();
+      ctx.fillStyle='#5a1f2e'; ctx.beginPath(); ctx.arc(0,-56,22,Math.PI,0); ctx.fill();
+      ctx.fillStyle='#2a1016'; ctx.fillRect(-10,-54,6,5); ctx.fillRect(4,-54,6,5);
+      ctx.restore();
+      // boss HP bar
+      var bw=Math.min(W*0.7,300), bx=W/2-bw/2, byy=54;
+      ctx.fillStyle='rgba(0,0,0,.5)'; ctx.fillRect(bx-3,byy-3,bw+6,16);
+      ctx.fillStyle='#3a1420'; ctx.fillRect(bx,byy,bw,10);
+      ctx.fillStyle='#ff5a7a'; ctx.fillRect(bx,byy,bw*Math.max(0,bo.hp/bo.hpMax),10);
+      ctx.fillStyle='#fff'; ctx.font='700 12px '+POP; ctx.fillText('BOSS',W/2,byy-12);
+    }
+    // boss bullets
+    ctx.fillStyle='#ffca4a'; GR.bossBullets.forEach(function(pb){ ctx.beginPath(); ctx.arc(pb.x,pb.y,6,0,7); ctx.fill(); });
+    // bullets
+    ctx.fillStyle='#eafff2'; GR.bullets.forEach(function(bu){ ctx.fillRect(bu.x-2,bu.y-8,4,10); });
+    // soldiers
+    grLayoutSoldiers();
+    for(var i=0;i<GR.soldiers.length;i++){ var so=GR.soldiers[i]; grDrawSoldier(ctx,so.x,so.y,1.5,GR.phase==='run',GR.t+so.ph); }
+    // count badge
+    var cx=grCrowdCX();
+    ctx.font='800 22px '+POP; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText('🪖 '+GR.count, cx, grCrowdY()+40);
+    ctx.fillStyle='#eaffe6'; ctx.fillText('🪖 '+GR.count, cx, grCrowdY()+40);
+    // floaters
+    GR.floaters.forEach(function(fl){ var a=1-fl.age/fl.life; ctx.globalAlpha=a; ctx.font='800 20px '+POP; ctx.lineWidth=4; ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.strokeText(fl.text,fl.x,fl.y); ctx.fillStyle=fl.color; ctx.fillText(fl.text,fl.x,fl.y); ctx.globalAlpha=1; });
+    // hit flash
+    if(GR.hitFlash>0){ ctx.fillStyle='rgba(255,60,80,'+(GR.hitFlash*1.4)+')'; ctx.fillRect(0,0,W,H); }
+    ctx.restore();
+    // hint
+    if(GR.phase==='run' && GR.t<3.2){ ctx.globalAlpha=0.85; ctx.fillStyle='#eafff2'; ctx.font='700 14px '+POP; ctx.textAlign='center'; ctx.fillText('← ゆびを 左右に うごかそう →', W/2, H*0.5); ctx.globalAlpha=1; }
+  }
+  function grDrawGateHalf(x0,x1,y,op,val){ var w=x1-x0; var good=(op==='×'||op==='+');
+    var col=good?'#2ec77a':'#d64a5a', colD=good?'#1f9e5c':'#a83543';
+    ctx.globalAlpha=0.9; ctx.fillStyle=col; ctx.fillRect(x0+3,y-30,w-6,60);
+    ctx.fillStyle=colD; ctx.fillRect(x0+3,y+18,w-6,12); ctx.globalAlpha=1;
+    ctx.fillStyle='#fff'; ctx.font='800 26px '+POP; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(op+val, x0+w/2, y); }
+  function grWin(){ MODE='menu'; LASTMODE='gate'; BGM.stop(); SFX.boss();
+    var coin=40+Math.round(GR.count*2)+Math.floor(Math.random()*20);
+    var drop=rollDrop({st:{mid:true}}); var n=1+(Math.random()<0.3?1:0);
+    addCoins(coin); addItem(drop,n); csave();
+    SAVE.clears++; persist(); record('gate','クリア','へいたい'+GR.count+'人');
+    document.getElementById('winTitle').textContent='ボスを たおした！';
+    document.getElementById('winMsg').textContent='さいご まで '+GR.count+'人 のこった！';
+    document.getElementById('winStats').innerHTML='<span style="color:#ffd36b">ごほうび</span><br>'+(ITEMS[drop].emoji||'')+ITEMS[drop].name+(n>1?' ×'+n:'')+'　🪙 '+coin+' コイン';
+    winScreen.hidden=false; }
+  function grLose(){ MODE='menu'; LASTMODE='gate'; BGM.stop(); SFX.hurt();
+    record('gate','ざんねん','とちゅうで ぜんめつ');
+    var ls=document.getElementById('loseSub'); if(ls) ls.innerHTML='へいたいが 0人に なっちゃった…<br>いい ゲートを えらんで リベンジ！';
+    loseScreen.hidden=false; }
+  // gate controls (drag left/right)
+  function grPointer(e){ if(MODE!=='gate') return; if(GR.phase!=='run') return; var p=ptc(e); var r=grRoad(); var l=(p.x-r.x0)/r.w; GR.targetLane=Math.max(0,Math.min(1,(l-0.16)/0.68)); e.preventDefault&&e.preventDefault(); }
+  canvas.addEventListener('mousedown',function(e){ if(MODE==='gate'){ GR.drag=true; grPointer(e); } });
+  canvas.addEventListener('mousemove',function(e){ if(MODE==='gate'&&GR.drag) grPointer(e); });
+  window.addEventListener('mouseup',function(){ GR.drag=false; });
+  canvas.addEventListener('touchstart',function(e){ if(MODE==='gate') grPointer(e); },{passive:false});
+  canvas.addEventListener('touchmove',function(e){ if(MODE==='gate') grPointer(e); },{passive:false});
+  document.getElementById('modeGate').addEventListener('click',function(){ actx(); grStart(); });
+
   function frame(now){ var dt=Math.min(0.05,(now-last)/1000); last=now;
     if(MODE==='action'){ if(G.aphase==='battle'||G.aphase==='telegraph'||G.aphase==='clear') updateA(dt); else G.time+=dt; renderA(); }
     else if(MODE==='rpg'){ rpgTime+=dt; rpgUpdate(dt); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,W,H); renderRpg(); }
+    else if(MODE==='gate'){ grUpdate(dt); ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,W,H); grRender(); }
     else { G.time+=dt; ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,W,H); ctx.save(); bgScene(false); ctx.restore(); }
     if(MODE==='action'){ ctx.setTransform(DPR,0,0,DPR,0,0); }
     requestAnimationFrame(frame);
